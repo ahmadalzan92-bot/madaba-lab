@@ -906,14 +906,25 @@ function loadProjectsState() {
     const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.projects)) {
+      if (parsed && Array.isArray(parsed.projects) && parsed.projects.length > 0) {
         projectsState = {
           nextProjectSerial: parsed.nextProjectSerial || parsed.projects.length + 1 || 1,
           activeProjectId: parsed.activeProjectId || null,
           updatedAt: parsed.updatedAt || 0,
           projects: parsed.projects
         };
+        return;
       }
+    }
+    if (typeof DEFAULT_PROJECTS_SEED !== "undefined" && DEFAULT_PROJECTS_SEED && Array.isArray(DEFAULT_PROJECTS_SEED.projects)) {
+      const seed = JSON.parse(JSON.stringify(DEFAULT_PROJECTS_SEED));
+      projectsState = {
+        nextProjectSerial: seed.nextProjectSerial || seed.projects.length + 1 || 1,
+        activeProjectId: seed.activeProjectId || (seed.projects[0] ? seed.projects[0].id : null),
+        updatedAt: seed.updatedAt || 0,
+        projects: seed.projects
+      };
+      localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projectsState));
     }
   } catch (e) {
     console.warn("تعذر تحميل بيانات المشاريع من التخزين المحلي", e);

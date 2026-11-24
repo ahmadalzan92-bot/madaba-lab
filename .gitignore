@@ -1,0 +1,11 @@
+# Cloudflare wrangler local state
+.wrangler/
+worker/.wrangler/
+node_modules/
+
+# Temporary / local reference documents
+*.pdf
+*.tmp
+~$*
+Thumbs.db
+desktop.ini

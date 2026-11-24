@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>نظام إدارة فحوصات مشاريع وزارة الأشغال العامة</title>
+  <style>
+    :root {
+      --primary-900: #1e3518;
+      --primary-800: #2b4922;
+      --primary-700: #3a612d;
+      --primary-100: #eef5eb;
+      --primary-50: #f6faf4;
+      --gold-700: #9a7418;
+      --gold-600: #c59b27;
+      --gold-100: #fdf8e7;
+      --slate-900: #0f172a;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --white: #ffffff;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: var(--slate-900);
+      background: var(--slate-100);
+      overflow: hidden;
+    }
+
+    .hidden { display: none !important; }
+
+    .portal-shell::-webkit-scrollbar,
+    .guide-page::-webkit-scrollbar { width: 10px; }
+
+    .portal-shell::-webkit-scrollbar-track,
+    .guide-page::-webkit-scrollbar-track { background: #e9eee7; }
+
+    .portal-shell::-webkit-scrollbar-thumb,
+    .guide-page::-webkit-scrollbar-thumb {
+      background: var(--primary-700);
+      border: 2px solid #e9eee7;
+      border-radius: 999px;
+    }
+
+    /* ===== البوابة الرئيسية ===== */
+    .portal-shell {
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-700) #e9eee7;
+      background:
+        radial-gradient(circle at top right, rgba(197, 155, 39, 0.12), transparent 42%),
+        linear-gradient(180deg, #f8faf7 0%, #eef2ed 100%);
+    }
+
+    .portal-header {
+      background: linear-gradient(135deg, var(--primary-900), var(--primary-700));
+      color: var(--white);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      border-bottom: 3px solid var(--gold-600);
+    }
+
+    .portal-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .portal-brand img {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+      background: var(--white);
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    .portal-kingdom, .portal-ministry {
+      font-size: 0.86rem;
+      opacity: 0.92;
+      line-height: 1.5;
+    }
+
+    .portal-directorate {
+      font-size: 1.02rem;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .portal-badge {
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .portal-main {
+      width: min(1080px, calc(100% - 32px));
+      margin: 34px auto;
+      flex: 1;
+    }
+
+    .portal-intro {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .portal-intro h1 {
+      font-size: clamp(1.35rem, 3.2vw, 2.15rem);
+      color: var(--primary-900);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .portal-intro p {
+      color: var(--slate-600);
+      font-size: 0.96rem;
+      line-height: 1.8;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .portal-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 18px;
+      justify-items: center;
+    }
+
+    .portal-card {
+      width: 100%;
+      max-width: 540px;
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-top: 4px solid var(--gold-600);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 22px;
+      display: flex;
+      gap: 16px;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .portal-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
+    }
+
+    .portal-card-icon.guide-icon {
+      background: var(--gold-100);
+      border-color: #f0dfae;
+      font-size: 1.8rem;
+    }
+
+    .portal-card-icon.team-icon {
+      background: #e8eef7;
+      border-color: #cbd9e8;
+      font-size: 1.8rem;
+    }
+
+    .guide-steps {
+      margin: 0 0 12px;
+      padding-inline-start: 20px;
+      font-size: 0.82rem;
+      color: var(--slate-600);
+      line-height: 1.7;
+    }
+
+    .guide-steps li + li { margin-top: 4px; }
+
+    .guide-more {
+      font-size: 0.8rem;
+      color: var(--slate-600);
+      margin-bottom: 12px;
+    }
+
+    .guide-more summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--gold-700);
+    }
+
+    .guide-more ul {
+      margin-top: 8px;
+      padding-inline-start: 18px;
+      line-height: 1.7;
+    }
+
+    .portal-card-icon {
+      flex: 0 0 62px;
+      height: 62px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 1.9rem;
+      background: var(--primary-100);
+      border: 1px solid #cfe0c9;
+    }
+
+    .portal-card-icon img {
+      display: block;
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .portal-card-body { flex: 1; min-width: 0; }
+
+    .portal-card-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--gold-700);
+      background: var(--gold-100);
+      border: 1px solid #f0dfae;
+      border-radius: 999px;
+      padding: 3px 10px;
+      margin-bottom: 8px;
+    }
+
+    .portal-card h2 {
+      font-size: 1.12rem;
+      color: var(--primary-900);
+      margin-bottom: 6px;
+    }
+
+    .portal-card p {
+      font-size: 0.86rem;
+      color: var(--slate-600);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .portal-card-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      font-size: 0.78rem;
+      color: var(--slate-500);
+      margin-bottom: 14px;
+    }
+
+    .portal-status {
+      font-weight: 800;
+      color: #15803d;
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+      border-radius: 999px;
+      padding: 3px 9px;
+    }
+
+    .portal-open-btn {
+      border: 0;
+      border-radius: 8px;
+      background: var(--primary-800);
+      color: var(--white);
+      font-weight: 800;
+      font-size: 0.86rem;
+      padding: 9px 16px;
+      cursor: pointer;
+    }
+
+    .portal-open-btn:hover { background: var(--primary-700); }
+
+    .portal-footer {
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--slate-500);
+      background: var(--white);
+      border-top: 1px solid var(--slate-200);
+      padding: 12px 16px;
+      line-height: 1.7;
+    }
+
+
+    /* ===== صفحة الدليل الإرشادي ===== */
+    .guide-page {
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-700) #e9eee7;
+      background:
+        radial-gradient(circle at top left, rgba(197, 155, 39, 0.12), transparent 42%),
+        linear-gradient(180deg, #f8faf7 0%, #eef2ed 100%);
+    }
+
+    .guide-topbar {
+      background: linear-gradient(135deg, var(--primary-900), var(--primary-700));
+      color: var(--white);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px 14px;
+      flex-wrap: wrap;
+      border-bottom: 3px solid var(--gold-600);
+    }
+
+    .guide-topbar strong { font-size: 0.95rem; }
+    .guide-topbar .crumb { font-size: 0.8rem; opacity: 0.78; }
+    .guide-topbar .spacer { flex: 1; }
+
+    .guide-main {
+      width: min(1080px, calc(100% - 32px));
+      margin: 26px auto 40px;
+      flex: 1;
+    }
+
+    .guide-hero {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-right: 6px solid var(--gold-600);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .guide-hero h1 {
+      font-size: clamp(1.3rem, 3vw, 1.9rem);
+      color: var(--primary-900);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .guide-hero > p {
+      color: var(--slate-600);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .guide-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .guide-flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .guide-flow-step {
+      background: var(--primary-50);
+      border: 1px solid #d8e6d2;
+      border-radius: var(--radius-md);
+      padding: 10px;
+      font-size: 0.78rem;
+      color: var(--slate-600);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .guide-flow-step strong {
+      display: block;
+      color: var(--primary-800);
+      margin-bottom: 3px;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+    }
+
+    .guide-item {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-top: 4px solid var(--primary-700);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 16px;
+    }
+
+    .guide-item-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .guide-item-icon {
+      flex: 0 0 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--primary-100);
+      display: grid;
+      place-items: center;
+      font-size: 1.3rem;
+    }
+
+    .guide-item h2 {
+      font-size: 1.02rem;
+      color: var(--primary-900);
+      line-height: 1.5;
+    }
+
+    .guide-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--gold-700);
+      background: var(--gold-100);
+      border: 1px solid #f0dfae;
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin-bottom: 8px;
+    }
+
+    .guide-item p {
+      font-size: 0.84rem;
+      color: var(--slate-600);
+      line-height: 1.75;
+    }
+
+    .guide-item ul {
+      margin: 8px 0 0;
+      padding-inline-start: 18px;
+      font-size: 0.8rem;
+      color: var(--slate-600);
+      line-height: 1.7;
+    }
+
+    .guide-item li + li { margin-top: 3px; }
+
+    @media (max-width: 640px) {
+      .guide-topbar { padding: 10px 14px; }
+      .guide-main { margin: 18px auto 30px; }
+      .guide-hero { padding: 16px; }
+    }
+
+    /* ===== مساحة الصفحة الفرعية المضمّنة ===== */
+    .app-shell {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #e8ede7;
+    }
+
+    .app-shell-bar {
+      background: var(--primary-900);
+      color: var(--white);
+      padding: 9px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px 14px;
+      flex-wrap: wrap;
+      border-bottom: 3px solid var(--gold-600);
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.18);
+      z-index: 2;
+    }
+
+    .app-shell-bar strong { font-size: 0.92rem; }
+    .app-shell-bar .crumb { font-size: 0.82rem; opacity: 0.8; }
+    .app-shell-bar .spacer { flex: 1; }
+
+    .app-shell-btn {
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--white);
+      border-radius: 7px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .app-shell-btn:hover { background: rgba(255, 255, 255, 0.22); }
+
+    .app-frame-card {
+      flex: 1;
+      min-height: 0;
+      margin: 10px;
+      background: var(--white);
+      border: 1px solid var(--slate-300);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      display: flex;
+    }
+
+    #appFrame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: var(--white);
+    }
+
+    @media (max-width: 640px) {
+      .portal-header { padding: 12px 16px; }
+      .portal-card { padding: 16px; }
+      .portal-card-icon { flex-basis: 50px; height: 50px; }
+      .app-frame-card { margin: 5px; }
+      .app-shell-bar { padding: 8px 10px; }
+    }
+
+    @media print {
+      .portal-shell, .app-shell-bar { display: none !important; }
+      .app-shell { display: block !important; height: auto !important; background: #fff !important; }
+      .app-frame-card { margin: 0 !important; border: 0 !important; box-shadow: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- البوابة الرئيسية -->
+  <div id="portalLanding" class="portal-shell">
+    <header class="portal-header">
+      <div class="portal-brand">
+        <img id="portalLogo" src="logo-web.png" alt="شعار وزارة الأشغال العامة والإسكان" />
+        <div>
+          <div class="portal-kingdom">المملكة الأردنية الهاشمية</div>
+          <div class="portal-kingdom">وزارة الأشغال العامة والإسكان</div>
+          <div class="portal-directorate">مديرية أشغال محافظة مأدبا — المختبر المركزي</div>
+        </div>
+      </div>
+      <div class="portal-badge">بوابة النظام</div>
+    </header>
+
+    <main class="portal-main">
+      <div class="portal-intro">
+        <h1>نظام إدارة فحوصات مشاريع وزارة الأشغال العامة</h1>
+        <p>
+          منصة موحّدة لحساب الحسميات والشذوذات المخبرية، وإدارة سجلات المشاريع والتقارير الرسمية
+          وفق المعادلات والجداول المعتمدة.
+        </p>
+      </div>
+
+      <div class="portal-cards">
+        <article class="portal-card" onclick="openAppPage()" tabindex="0" role="button" aria-label="فتح نظام فحوصات ومشاريع الطرق">
+          <div class="portal-card-icon" aria-hidden="true">
+            <img id="portalCardIcon" src="portal-card-icon.png" alt="أيقونة الصفحة الفرعية" />
+          </div>
+          <div class="portal-card-body">
+            <span class="portal-card-tag">الصفحة الفرعية الحالية</span>
+            <h2>فحوصات ومشاريع الطرق</h2>
+            <p>
+              الحاسبة الشاملة، جداول الحسميات والشذوذات، سجل المشروع، التقارير الرسمية،
+              والتصدير إلى Excel وWord والطباعة على A4.
+            </p>
+            <div class="portal-card-meta">
+              <span>مديرية أشغال محافظة مأدبا</span>
+              <span class="portal-status">جاهز للعمل</span>
+            </div>
+            <button type="button" class="portal-open-btn" onclick="event.stopPropagation(); openAppPage()">فتح الصفحة ←</button>
+          </div>
+        </article>
+
+        <!-- بطاقة الدليل الإرشادي -->
+        <article class="portal-card guide-card" role="button" tabindex="0" onclick="openGuidePage()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openGuidePage();}" aria-label="فتح الدليل الإرشادي لشرح جميع تبويبات النظام">
+          <div class="portal-card-icon guide-icon" aria-hidden="true">📘</div>
+          <div class="portal-card-body">
+            <span class="portal-card-tag">دليل الاستخدام</span>
+            <h2>الدليل الإرشادي السريع</h2>
+            <p>
+              نظام متكامل لحساب الحسميات والشذوذات المخبرية، وإدارة المشاريع والتقارير الرسمية
+              وفق المعادلات والجداول المعتمدة في كتاب الإصدار 2023.
+            </p>
+            <ol class="guide-steps">
+              <li>أنشئ مشروعاً جديداً من تبويب «إدارة المشاريع» وأدخل بياناته.</li>
+              <li>من «الحاسبة الشاملة» اختر الجدول والفحص وأدخل القيم والقياسات.</li>
+              <li>أضف النتيجة إلى السجل التراكمي للمشروع النشط وعدّل التواريخ عند الحاجة.</li>
+              <li>أنشئ التقرير، اختر الصفوف، ثم صدّره Excel أو Word أو PDF/طباعة A4.</li>
+            </ol>
+            <details class="guide-more">
+              <summary>نصائح مهمة</summary>
+              <ul>
+                <li>البيانات محفوظة تلقائياً في المتصفح، ويمكن تصديرها أو استيرادها كملف JSON.</li>
+                <li>تظهر الأرقام دائماً بالصيغة اللاتينية 123، والتواريخ قابلة للتعديل بصيغة يوم/شهر/سنة.</li>
+                <li>يمنع النظام تكرار المشاريع أو الفحوصات أو التقارير ويعرض تنبيهاً واضحاً.</li>
+              </ul>
+            </details>
+            <div class="portal-card-meta">
+              <span>يعمل دون اتصال بالإنترنت</span>
+              <span class="portal-status">جاهز للاستخدام</span>
+            </div>
+            <button type="button" class="portal-open-btn" onclick="event.stopPropagation(); openGuidePage()">فتح الدليل ←</button>
+          </div>
+        </article>
+
+        <!-- بطاقة فريق العمل -->
+        <article class="portal-card team-card" role="button" tabindex="0" onclick="openTeamPage()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTeamPage();}" aria-label="فتح صفحة فريق إعداد النظام وتصميمه">
+          <div class="portal-card-icon team-icon" aria-hidden="true">👥</div>
+          <div class="portal-card-body">
+            <span class="portal-card-tag">فريق العمل</span>
+            <h2>فريق إعداد النظام وتصميمه</h2>
+            <p>
+              تعرّف على أدوار فريق المختبر ومهندسي الطرق في مراجعة المرجع الهندسي،
+              وبناء المعادلات، وتصميم الواجهات، واختبار التقارير والتصدير.
+            </p>
+            <div class="portal-card-meta">
+              <span>مديرية أشغال محافظة مأدبا</span>
+              <span class="portal-status">الفريق المعتمد</span>
+            </div>
+            <button type="button" class="portal-open-btn" onclick="event.stopPropagation(); openTeamPage()">فتح صفحة الفريق ←</button>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <footer class="portal-footer">
+      وزارة الأشغال العامة والإسكان — مديرية أشغال محافظة مأدبا | المختبر المركزي-الحسميات والشذوذات
+    </footer>
+  </div>
+
+  <!-- صفحة الدليل الإرشادي لشرح جميع تبويبات النظام -->
+  <div id="guidePage" class="guide-page hidden">
+    <header class="guide-topbar">
+      <button type="button" class="app-shell-btn" onclick="backToPortalFromGuide()">↩️ العودة للبوابة</button>
+      <div>
+        <strong>الدليل الإرشادي</strong>
+        <span class="crumb"> / شرح جميع تبويبات النظام</span>
+      </div>
+      <div class="spacer"></div>
+      <button type="button" class="app-shell-btn" onclick="openAppPage()">فتح النظام ←</button>
+    </header>
+
+    <main class="guide-main">
+      <section class="guide-hero">
+        <span class="portal-card-tag">دليل الاستخدام</span>
+        <h1>دليل نظام إدارة فحوصات مشاريع الطرق</h1>
+        <p>
+          يشرح هذا الدليل وظيفة كل تبويب في النظام، وترتيب العمل الصحيح من إنشاء المشروع حتى إصدار التقرير الرسمي،
+          مع الالتزام بالمعادلات والجداول المعتمدة في كتاب «أسس القبول والقبول مع الحسم والرفض لمشاريع الطرق — إصدار 2023».
+        </p>
+        <div class="guide-flow">
+          <div class="guide-flow-step"><strong>1</strong>إنشاء مشروع جديد</div>
+          <div class="guide-flow-step"><strong>2</strong>إدخال فحص بالحاسبة</div>
+          <div class="guide-flow-step"><strong>3</strong>مراجعة الكشف التراكمي</div>
+          <div class="guide-flow-step"><strong>4</strong>إنشاء التقرير واختيار الصفوف</div>
+          <div class="guide-flow-step"><strong>5</strong>التصدير والطباعة على A4</div>
+        </div>
+        <div class="guide-actions">
+          <button type="button" class="portal-open-btn" onclick="openAppPage()">🧮 فتح النظام والبدء</button>
+          <button type="button" class="app-shell-btn" onclick="backToPortalFromGuide()" style="color:#1e3518;background:#eef5eb;border-color:#cfe0c9;">↩️ العودة للبوابة</button>
+        </div>
+      </section>
+
+      <div class="guide-grid">
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">📁</div>
+            <div>
+              <span class="guide-badge">البداية</span>
+              <h2>إدارة المشاريع والتقارير</h2>
+            </div>
+          </div>
+          <p>الوحة الرئيسية لإنشاء المشاريع ومتابعة كل مشروع في صفحة مستقلة.</p>
+          <ul>
+            <li>زر «إضافة مشروع جديد» يفتح نافذة إدخال الاسم والرقم والمقاول والاستشاري ونوع العينة والموقع والطول.</li>
+            <li>صفحة المشروع تعرض الإحصاءات وسجل الفحوصات والتقارير الصادرة له.</li>
+            <li>منها يمكن تعديل بيانات المشروع، وتصديره أو استيراده بصيغة JSON، وإنشاء تقرير جديد.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">🗂️</div>
+            <div>
+              <span class="guide-badge">تنظيم</span>
+              <h2>قائمة المشاريع</h2>
+            </div>
+          </div>
+          <p>عرض شامل لجميع المشاريع المسجلة عند العمل على أكثر من مشروع.</p>
+          <ul>
+            <li>بحث سريع بالاسم أو رقم المشروع أو المقاول أو الاستشاري أو الموقع.</li>
+            <li>فتح المشروع مباشرة إلى صفحته الخاصة وسجله وتقاريره.</li>
+            <li>حذف المشروع مع كامل سجله وتقاريره بعد تأكيد الحذف.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">📑</div>
+            <div>
+              <span class="guide-badge">متابعة</span>
+              <h2>التقارير</h2>
+            </div>
+          </div>
+          <p>لوحة مستقلة لمتابعة كل التقارير الصادرة في المشاريع ومؤشرات أدائها.</p>
+          <ul>
+            <li>بحث فوري باسم المشروع أو رقم التقرير أو اسم التقرير.</li>
+            <li>فلترة التقارير حسب المشروع وحالة الاعتماد، مع مؤشرات للمشاريع والتقارير والحسميات.</li>
+            <li>كل مشروع في قسم مستقل يعرض تقاريره وعدد الفحوصات وقيم الحسم.</li>
+            <li>تمييز «تحتاج إعادة فحص» و«مقبول مع حسم» و«مقبول بدون حسم» بشارات واضحة.</li>
+            <li>تعديل تاريخ التقرير وعرض الصفوف وطباعتها وتصديرها من داخل اللوحة مباشرة.</li>
+            <li>إصدار كتاب للمقاول بالفحوصات المرفوضة لتصويبها، ومذكرة داخلية لمدير الأشغال بالفحوصات المحددة، مع معاينة وطباعة A4 وتصدير Word.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">🧮</div>
+            <div>
+              <span class="guide-badge">الأساس</span>
+              <h2>الحاسبة الشاملة للحسميات (معادلة 1 و 2)</h2>
+            </div>
+          </div>
+          <p>المحرك الرئيسي لحساب قيمة الحسم بسبب شذوذ الفحوصات المخبرية.</p>
+          <ul>
+            <li>اختيار تصنيف الطريق والجدول والفحص من الجداول 5 إلى 16.</li>
+            <li>إدخال الكمية الممثلة (ك) والسعر (س) ونتائج المراحل الثلاث مع أوزان الجدول 3 القابلة للتعديل.</li>
+            <li>عرض النتيجة المالية المفصلة وإضافتها إلى الكشف التراكمي للمشروع النشط.</li>
+            <li>الكشف التراكمي قابل للتعديل المباشر، وضبط تاريخه بصيغة يوم/شهر/سنة.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">📏</div>
+            <div>
+              <span class="guide-badge">البند 2.2.2</span>
+              <h2>سماكة الخلطة الإسفلتية (جدول 4)</h2>
+            </div>
+          </div>
+          <p>تحديد فروقات السماكة لطبقات الخلطة الإسفلتية وحسمها وفق الجدول 4.</p>
+          <ul>
+            <li>تقييم منفصل لكورات التنفيذ وضبط الجودة، مع مساحة ممثلة محسوبة لكل مرحلة.</li>
+            <li>تفاوت مسموح 3 مم لطبقة و5 مم لطبقتين و7 مم لثلاث طبقات، وسماح 5 مم لطبقة 5 سم.</li>
+            <li>نسبة 10% من الكورات تُقرَّب لأعلى ويُعفى أعلى الكورات شذوذاً أولاً.</li>
+            <li>النقص حتى 10% يُحسم، وما زاد عن 10% يُرفض ويُعالج بإضافة طبقة إسفلتية.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">🚜</div>
+            <div>
+              <span class="guide-badge">البند 2.2.4</span>
+              <h2>درجات رك الإسفلت</h2>
+            </div>
+          </div>
+          <p>تقييم درجات الرك لكل طريق منفصل ولكل يوم عمل.</p>
+          <ul>
+            <li>إدخال درجة الرك المطلوبة ومساحة يوم العمل والسعر وقراءات الكورات.</li>
+            <li>أي كور يقل بأكثر من 3 درجات يُستثنى من المعدل ويُرفض حسب ما يمثله.</li>
+            <li>التنفيذ وضبط الجودة: سماح -2 درجة وحسم 30% موزّعاً تراكمياً.</li>
+            <li>لجنة الاستلام: سماح -1 درجة وحسم 20% للدرجة الثانية، مع زر تحميل المثال 6.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">🪨</div>
+            <div>
+              <span class="guide-badge">البند 2.1</span>
+              <h2>سماكة الفرشيات وحفر الاختبار</h2>
+            </div>
+          </div>
+          <p>حاسبتان لفحص الفرشيات وتصنيف حفر الاختبار لغايات الاستلام.</p>
+          <ul>
+            <li>سماكة الفرشيات: عينة أصلية وعينة على بعد 10 م قبلها وأخرى بعدها، ويحسب معدل الثلاث.</li>
+            <li>لا يتجاوز النقص 25% لأي نقطة، و15% للمعدل، مع طرح سماح المواصفة -1 سم قبل الحسم.</li>
+            <li>تجاوز 15% للمعدل يعني تعويض النقص بإضافة طبقة إسفلتية تحددها اللجنة.</li>
+            <li>حسب طول المشروع يحدد الجدول 1 الحد الأدنى لعدد الحفر الكبيرة والصغيرة.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">📘</div>
+            <div>
+              <span class="guide-badge">الملحق 3</span>
+              <h2>أمثلة الكتاب التفاعلية</h2>
+            </div>
+          </div>
+          <p>الأمثلة التوضيحية المعتمدة من الملحق رقم 3 بنصوصها ومعادلاتها الأصلية.</p>
+          <ul>
+            <li>تغطي الصفحات 44 إلى 49 من الكتاب المرجعي.</li>
+            <li>يمكن تغيير الكمية الممثلة (A) والسعر للوحدة (B) في أي مثال.</li>
+            <li>تُحدَّث المعادلات والنتيجة فوراً لمراجعة تطابق الحسابات مع الكتاب.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">📋</div>
+            <div>
+              <span class="guide-badge">مرجع</span>
+              <h2>الجداول المرجعية الكاملة (1 – 16)</h2>
+            </div>
+          </div>
+          <p>موسوعة بجميع جداول الكتاب لمراجعة الحدود والنسب أثناء الحساب.</p>
+          <ul>
+            <li>جداول القسم الأول والثاني 1 إلى 4.</li>
+            <li>ملحق 1 للطرق الرئيسية والثانوية والقروية: جداول 5 إلى 12.</li>
+            <li>ملحق 2 للطرق الزراعية: جداول 13 إلى 16.</li>
+            <li>فلترة سريعة بين المجموعات، مع حدود التجاوز والتفاوت ونسب الحسم والملاحظات الملزمة.</li>
+          </ul>
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <!-- صفحة فريق العمل وأدواره في إعداد وتصميم النظام -->
+  <div id="teamPage" class="guide-page hidden">
+    <header class="guide-topbar">
+      <button type="button" class="app-shell-btn" onclick="backToPortalFromTeam()">↩️ العودة للبوابة</button>
+      <div>
+        <strong>فريق العمل</strong>
+        <span class="crumb"> / أدوار الإعداد والتصميم</span>
+      </div>
+      <div class="spacer"></div>
+      <button type="button" class="app-shell-btn" onclick="openAppPage()">فتح النظام ←</button>
+    </header>
+
+    <main class="guide-main">
+      <section class="guide-hero">
+        <span class="portal-card-tag">فريق العمل</span>
+        <h1>فريق إعداد وتصميم نظام فحوصات الطرق</h1>
+        <p>
+          ضمّ فريق العمل رأس المختبر ومهندسي الطرق لمراجعة الكتاب المرجعي، وتحويل معادلاته وجداوله إلى حاسبات عملية،
+          ثم تصميم واجهة النظام واختبار التقارير وملفات التصدير حتى يخرج الحل متوافقاً مع أعمال المختبر الميدانية.
+        </p>
+        <div class="guide-flow">
+          <div class="guide-flow-step"><strong>1</strong>مراجعة المرجع الهندسي</div>
+          <div class="guide-flow-step"><strong>2</strong>بناء المعادلات والجداول</div>
+          <div class="guide-flow-step"><strong>3</strong>تصميم شاشات الإدخال</div>
+          <div class="guide-flow-step"><strong>4</strong>ضبط التقارير والتصدير</div>
+          <div class="guide-flow-step"><strong>5</strong>الاختبار والاعتماد</div>
+        </div>
+        <div class="guide-actions">
+          <button type="button" class="portal-open-btn" onclick="openAppPage()">🧮 فتح النظام</button>
+          <button type="button" class="app-shell-btn" onclick="backToPortalFromTeam()" style="color:#1e3518;background:#eef5eb;border-color:#cfe0c9;">↩️ العودة للبوابة</button>
+        </div>
+      </section>
+
+      <div class="guide-grid">
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">👤</div>
+            <div>
+              <span class="guide-badge">رئيس القسم</span>
+              <h2>م. براءة الغليلات</h2>
+            </div>
+          </div>
+          <p>رئيس قسم مختبر أشغال مأدبا</p>
+          <ul>
+            <li>اعتماد المنهجية الهندسية المستندة إلى كتاب الإصدار 2023 ومراجعة نطاق العمل المطلوب.</li>
+            <li>مراجعة المعادلات والجداول المعتمدة والتأكد من مطابقة النتائج لأمثلة الملحق 3.</li>
+            <li>إقرار شكل التقرير الرسمي والتوقيعات واعتماد مخرجات النظام للاستخدام الميداني.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">🛣️</div>
+            <div>
+              <span class="guide-badge">مهندس طرق</span>
+              <h2>م. أيمن الفساطلة</h2>
+            </div>
+          </div>
+          <p>مهندس طرق — فريق الإعداد والتصميم</p>
+          <ul>
+            <li>تحويل جداول الحسميات والشذوذات إلى قواعد حسابية قابلة للتنفيذ داخل الحاسبة الشاملة.</li>
+            <li>ضبط اختيار الجداول 5 إلى 16 حسب تصنيف الطريق ونوع الفحص والطبقة.</li>
+            <li>مراجعة أمثلة الكتاب التفاعلية ومطابقة قيمها مع المعادلات المعتمدة.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">📐</div>
+            <div>
+              <span class="guide-badge">مهندس طرق</span>
+              <h2>م. أحمد الزن</h2>
+            </div>
+          </div>
+          <p>مهندس طرق — فريق الإعداد والتصميم</p>
+          <ul>
+            <li>تصميم حاسبات سماكة الخلطة الإسفلتية ودرجات الرك وسماح الفرشيات وحفر الاختبار.</li>
+            <li>ضبط قواعد سماح المواصفات ونسب الحسم وحدود الرفض في كل وحدة حسابية.</li>
+            <li>اختبار الحاسبات على حالات عملية والتأكد من ظهور النتائج وتفسير القرار بوضوح.</li>
+          </ul>
+        </article>
+
+        <article class="guide-item">
+          <div class="guide-item-head">
+            <div class="guide-item-icon" aria-hidden="true">🗂️</div>
+            <div>
+              <span class="guide-badge">مهندس طرق</span>
+              <h2>م. محمد الحيصة</h2>
+            </div>
+          </div>
+          <p>مهندس طرق — فريق الإعداد والتصميم</p>
+          <ul>
+            <li>تنظيم هيكل المشاريع والسجلات المستقلة وربط الفحوصات بالتقارير الرسمية.</li>
+            <li>تصميم شاشات إدخال البيانات والكشف التراكمي وتجربة المستخدم داخل التبويبات.</li>
+            <li>متابعة مخرجات Excel وWord والطباعة على A4 وضبط تناسقها مع معاينة التقرير.</li>
+          </ul>
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <!-- عرض التطبيق الحالي كصفحة فرعية داخل بطاقة -->
+  <div id="appShell" class="app-shell hidden">
+    <div class="app-shell-bar">
+      <button type="button" class="app-shell-btn" onclick="backToPortal()">↩️ العودة للبوابة</button>
+      <div>
+        <strong>نظام إدارة فحوصات مشاريع وزارة الأشغال العامة</strong>
+        <span class="crumb"> / فحوصات ومشاريع الطرق</span>
+      </div>
+      <div class="spacer"></div>
+      <button type="button" class="app-shell-btn" onclick="openAppInNewTab()">↗️ فتح في نافذة جديدة</button>
+    </div>
+    <div class="app-frame-card">
+      <iframe id="appFrame" title="نظام فحوصات ومشاريع الطرق" allow="fullscreen"></iframe>
+    </div>
+  </div>
+
+  <!-- يُحقن هنا التطبيق الحالي كاملاً أثناء البناء (نسخة واحدة داخل ملف مستقل) -->
+  <template id="appPageTemplate"><!-- APP_HTML --></template>
+
+  <script>
+    function hideAllPortalViews() {
+      ["portalLanding", "appShell", "guidePage", "teamPage"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add("hidden");
+      });
+    }
+
+    function openAppPage() {
+      const frame = document.getElementById("appFrame");
+      if (frame && !frame.srcdoc) {
+        frame.srcdoc = document.getElementById("appPageTemplate").innerHTML;
+      }
+      hideAllPortalViews();
+      document.getElementById("appShell").classList.remove("hidden");
+      history.replaceState(null, "", "#app");
+      if (frame) window.setTimeout(() => frame.focus(), 0);
+    }
+
+    function openGuidePage() {
+      hideAllPortalViews();
+      const guide = document.getElementById("guidePage");
+      if (guide) {
+        guide.classList.remove("hidden");
+        guide.scrollTop = 0;
+      }
+      window.scrollTo(0, 0);
+      history.replaceState(null, "", "#guide");
+    }
+
+    function openTeamPage() {
+      hideAllPortalViews();
+      const team = document.getElementById("teamPage");
+      if (team) {
+        team.classList.remove("hidden");
+        team.scrollTop = 0;
+      }
+      window.scrollTo(0, 0);
+      history.replaceState(null, "", "#team");
+    }
+
+    function backToPortal() {
+      hideAllPortalViews();
+      document.getElementById("portalLanding").classList.remove("hidden");
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+
+    function backToPortalFromGuide() {
+      backToPortal();
+    }
+
+    function backToPortalFromTeam() {
+      backToPortal();
+    }
+
+    function openAppInNewTab() {
+      const url = location.href.split("#")[0] + "#app";
+      window.open(url, "_blank");
+    }
+
+    function syncViewWithHash() {
+      if (location.hash === "#app") openAppPage();
+      else if (location.hash === "#guide") openGuidePage();
+      else if (location.hash === "#team") openTeamPage();
+      else {
+        hideAllPortalViews();
+        document.getElementById("portalLanding").classList.remove("hidden");
+      }
+    }
+
+    window.addEventListener("hashchange", syncViewWithHash);
+    syncViewWithHash();
+  </script>
+</body>
+</html>

@@ -1368,6 +1368,7 @@ function deleteProject(id) {
   renderProjectsList();
   refreshActiveProjectUI();
   showProjectsListView(false);
+  syncProjectsWithCloud();
 }
 
 /* ==================== تعديل بيانات المشروع ==================== */
@@ -2563,7 +2564,11 @@ function confirmReportRows() {
   const reportId = document.getElementById("reportRowsReportId").value;
   const report = reportId ? p.reports.find((x) => x.id === reportId) : null;
   if (report) {
-    report.visibleItemIds = selectedIds.length >= report.items.length ? null : selectedIds;
+    if (selectedIds.length >= report.items.length) {
+      alert("فعّال «الصفوف» وحدد فحصاً واحداً على الأقل لإنشاء تقرير جديد — حدد «جميع الفحوصات» لتظهر جميع الفحوصات في نسخة جديدة.");
+      return;
+    }
+    report.visibleItemIds = selectedIds;
     saveProjectsState();
     renderProjectsList();
     renderProjectWorkspace(p);
@@ -2573,6 +2578,7 @@ function confirmReportRows() {
       if (content) content.innerHTML = currentPrintReportHTML;
     }
     closeReportRowsModal();
+    syncProjectsWithCloud();
     return;
   }
 
@@ -2611,6 +2617,7 @@ function createProjectReportFromItems(p, items) {
   renderProjectsList();
   renderProjectWorkspace(p);
   openReportModal(p.id, report.id);
+  syncProjectsWithCloud();
   return true;
 }
 

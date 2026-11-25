@@ -1849,7 +1849,6 @@ function renderReportsDashboard() {
                 <button type="button" class="btn btn-excel btn-sm" onclick="exportReportExcel('${p.id}','${r.id}')">📗 Excel</button>
                 <button type="button" class="btn btn-word btn-sm" onclick="exportReportWord('${p.id}','${r.id}')">📘 Word</button>
                 <button type="button" class="btn btn-edit btn-sm" onclick="openReportRowsModal('${p.id}','${r.id}')" title="تحديد الصفوف الظاهرة">✂️ الصفوف</button>
-                <button type="button" class="btn btn-edit btn-sm" onclick="openCorrespondenceModal('contractor','${p.id}','${r.id}')" title="كتاب للمقاول بالفحوصات المرفوضة">✉️ كتاب مقاول</button>
                 <button type="button" class="btn btn-outline-dark btn-sm" onclick="openCorrespondenceModal('memo','${p.id}','${r.id}')" title="مذكرة داخلية لمدير الأشغال">📝 مذكرة داخلية</button>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="openProject('${p.id}')">📁 المشروع</button>
                 <button type="button" class="btn btn-danger-outline btn-sm" onclick="deleteProjectReport('${p.id}','${r.id}')" title="حذف التقرير">🗑️</button>
@@ -1883,25 +1882,49 @@ function renderReportsDashboard() {
     .join("");
 }
 
-/* ==================== مراسلات المختبر: كتاب للمقاول ومذكرة داخلية ==================== */
+/* ==================== مذكرة داخلية رسمية لمدير الأشغال ==================== */
 const CORRESPONDENCE_DEFS = {
-  contractor: {
-    label: "كتاب إلى المقاول",
-    docLabel: "كتاب",
-    title: "كتاب إلى المقاول بشأن الفحوصات المرفوضة",
-    subtitle: "إشعار بتصويب الفحوصات المخبرية غير المطابقة للأسس المعتمدة — الإصدار 2023 م",
-    subject: "إشعار بفحوصات مخبرية مرفوضة وطلب تصويبها"
-  },
   memo: {
     label: "مذكرة داخلية",
     docLabel: "مذكرة",
-    title: "مذكرة داخلية إلى مدير أشغال محافظة مأدبا",
-    subtitle: "إحاطة علماً بنتائج الفحوصات المرفوضة والتوصية بإعادة الفحص — الإصدار 2023 م",
-    subject: "نتائج فحوصات مخبرية مرفوضة والتوصية بإعادة الفحص"
+    title: "مذكرة داخلية",
+    subtitle: "وزارة الأشغال العامة والإسكان",
+    subject: ""
   }
 };
 
 let correspondenceState = null;
+
+function formatMemoDinars(value) {
+  const n = Number(value) || 0;
+  const rounded1 = Math.round(n * 10) / 10;
+  if (Math.abs(rounded1 - Math.round(rounded1)) < 1e-9) return String(Math.round(rounded1));
+  return rounded1.toFixed(1);
+}
+
+function buildDefaultMemoSubject(p) {
+  const no = (p && p.projectNo ? p.projectNo : "").trim();
+  const name = (p && p.name ? p.name : "").trim();
+  if (!name) return `عطاء رقم ${no}`;
+  const prefix = /^[اأإآ]/.test(name) ? "ب" : "بـ ";
+  return `عطاء رقم ${no} الخاص ${prefix}${name}`;
+}
+
+function buildDefaultMemoPoints(items) {
+  const list = items || [];
+  const totals = computeTotals(list);
+  const rejected = list.filter((it) => it.anyRejected);
+  const lines = [];
+  if (totals.deduction > 0 || !rejected.length) {
+    lines.push(`1- ( ${formatMemoDinars(totals.deduction)} دينار ) بسبب الشذوذات في الفحوصات المخبريــــــــــــــــــــة .`);
+  }
+  if (rejected.length > 0) {
+    const idx = lines.length + 1;
+    const names = rejected.map((it) => `${it.itemName}${it.location ? " - " + it.location : ""}`).join(" ، ");
+    lines.push(`${idx}- رفض الفحوصات المخبرية التالية لتجاوز الحدود المسموحة في الأسس: ( ${names} ) .`);
+  }
+  return lines.join("\n");
+}
 
 function closeCorrespondenceModal() {
   const modal = document.getElementById("correspondenceModal");
@@ -1914,44 +1937,54 @@ function closeCorrespondencePreview() {
 }
 
 function openCorrespondenceModal(kind, projectId, reportId) {
-  const def = CORRESPONDENCE_DEFS[kind];
-  if (!def) return;
+  const resolvedKind = "memo";
+  const def = CORRESPONDENCE_DEFS[resolvedKind];
   const p = getProjectById(projectId);
   if (!p) return;
   const r = p.reports.find((x) => x.id === reportId);
   if (!r) return;
   const items = getReportView(p, r).items;
   if (!items.length) {
-    alert("لا توجد فحوصات في هذا التقرير لإصدار المراسلة.");
+    alert("لا توجد فحوصات في هذا التقرير لإصدار المذكرة الداخلية.");
     return;
   }
   const rejected = items.filter((it) => it.anyRejected);
-  if (!rejected.length && kind === "contractor") {
-    alert("لا توجد فحوصات مرفوضة في هذا التقرير. يمكنك تحديد الفحوصات المطلوبة يدوياً من القائمة.");
-  }
+  const defaultSelectedIds = items.map((it) => it.id);
+  const defaultSubject = buildDefaultMemoSubject(p);
+  const defaultPoints = buildDefaultMemoPoints(items);
 
   correspondenceState = {
-    kind,
+    kind: resolvedKind,
     projectId,
     reportId,
     items,
-    selectedIds: rejected.map((it) => it.id),
+    selectedIds: defaultSelectedIds,
     docNo: `${p.projectNo}/${def.docLabel}/${String(r.serialNumber).padStart(3, "0")}`,
     date: formatDate(r.date),
-    note: "",
+    fromText: "رئيس قسم المختبر / م.براءة الغليلات",
+    toText: "مدير أشغال محافظة مادبا",
+    subject: defaultSubject,
+    note: defaultPoints,
+    lastAutoPoints: defaultPoints,
     html: ""
   };
 
   document.getElementById("correspondenceProjectId").value = p.id;
   document.getElementById("correspondenceReportId").value = r.id;
-  document.getElementById("correspondenceKind").value = kind;
+  document.getElementById("correspondenceKind").value = resolvedKind;
   document.getElementById("correspondenceDocNo").value = correspondenceState.docNo;
   document.getElementById("correspondenceDate").value = correspondenceState.date;
-  document.getElementById("correspondenceNote").value = "";
+  const fromEl = document.getElementById("correspondenceFrom");
+  const toEl = document.getElementById("correspondenceTo");
+  const subjEl = document.getElementById("correspondenceSubject");
+  if (fromEl) fromEl.value = correspondenceState.fromText;
+  if (toEl) toEl.value = correspondenceState.toText;
+  if (subjEl) subjEl.value = correspondenceState.subject;
+  document.getElementById("correspondenceNote").value = defaultPoints;
   document.getElementById("correspondenceModalTitle").textContent = `${def.label} — ${r.reportNo}`;
   document.getElementById("correspondenceIntro").innerHTML =
     `<strong>التقرير المرجعي:</strong> <span dir="ltr">${escHTML(r.reportNo)}</span> — ${escHTML(p.name)} | ` +
-    `الفحوصات المرفوضة في التقرير: <strong>${rejected.length}</strong> من ${items.length}`;
+    `إجمالي الفحوصات: <strong>${items.length}</strong> (منها مرفوضة: <strong>${rejected.length}</strong>)`;
 
   renderCorrespondenceItems();
   closeCorrespondencePreview();
@@ -1987,6 +2020,17 @@ function getSelectedCorrespondenceIds() {
     .map((box) => box.dataset.itemId);
 }
 
+function syncAutoMemoPointsIfUnedited(selectedItems) {
+  const st = correspondenceState;
+  const noteEl = document.getElementById("correspondenceNote");
+  if (!st || !noteEl) return;
+  const nextPoints = buildDefaultMemoPoints(selectedItems);
+  if (!noteEl.value.trim() || noteEl.value.trim() === (st.lastAutoPoints || "").trim()) {
+    noteEl.value = nextPoints;
+  }
+  st.lastAutoPoints = nextPoints;
+}
+
 function onCorrespondenceItemChange() {
   if (!correspondenceState) return;
   correspondenceState.selectedIds = getSelectedCorrespondenceIds();
@@ -2010,8 +2054,10 @@ function updateCorrespondenceCount() {
   const label = document.getElementById("correspondenceCount");
   if (!st || !label) return;
   const ids = getSelectedCorrespondenceIds();
-  const totals = computeTotals(st.items.filter((it) => ids.includes(it.id)));
-  label.textContent = `المحدد: ${ids.length} من ${st.items.length} فحص — الحسم: ${formatMoney(totals.deduction)} د.أ`;
+  const selectedItems = st.items.filter((it) => ids.includes(it.id));
+  const totals = computeTotals(selectedItems);
+  label.textContent = `المحدد: ${ids.length} من ${st.items.length} فحص — الحسم: ${formatMemoDinars(totals.deduction)} دينار (${formatMoney(totals.deduction)} د.أ)`;
+  syncAutoMemoPointsIfUnedited(selectedItems);
 }
 
 function normalizeCorrespondenceDate(input) {
@@ -2030,119 +2076,153 @@ function collectCorrespondenceContext() {
 
   const docNoEl = document.getElementById("correspondenceDocNo");
   const dateEl = document.getElementById("correspondenceDate");
+  const fromEl = document.getElementById("correspondenceFrom");
+  const toEl = document.getElementById("correspondenceTo");
+  const subjEl = document.getElementById("correspondenceSubject");
   const noteEl = document.getElementById("correspondenceNote");
-  st.docNo = docNoEl ? docNoEl.value.trim() : st.docNo;
-  if (!st.docNo) {
-    alert("يرجى إدخال رقم المراسلة قبل الإصدار.");
-    if (docNoEl) docNoEl.focus();
-    return null;
-  }
+  st.docNo = (docNoEl && docNoEl.value.trim()) ? docNoEl.value.trim() : st.docNo;
   const date = validEditedDate(dateEl, st.date);
   if (!date) return null;
   st.date = date;
-  st.note = noteEl ? noteEl.value.trim() : "";
+  st.fromText = (fromEl && fromEl.value.trim()) ? fromEl.value.trim() : "رئيس قسم المختبر / م.براءة الغليلات";
+  st.toText = (toEl && toEl.value.trim()) ? toEl.value.trim() : "مدير أشغال محافظة مادبا";
+  st.subject = (subjEl && subjEl.value.trim()) ? subjEl.value.trim() : buildDefaultMemoSubject(p);
   st.selectedIds = getSelectedCorrespondenceIds();
   if (!st.selectedIds.length) {
-    alert("يرجى تحديد فحص واحد على الأقل لإدراجه في المراسلة.");
+    alert("يرجى تحديد فحص واحد على الأقل لإدراجه في المذكرة الداخلية.");
     return null;
   }
   st.selectedItems = st.items.filter((it) => st.selectedIds.includes(it.id));
+  st.note = (noteEl && noteEl.value.trim()) ? noteEl.value.trim() : buildDefaultMemoPoints(st.selectedItems);
   return { project: p, report: r, state: st };
 }
 
 function buildCorrespondenceHTML(p, r, st) {
-  const def = CORRESPONDENCE_DEFS[st.kind];
   const items = st.selectedItems || [];
-  const totals = computeTotals(items);
-  const rejectedCount = items.filter((it) => it.anyRejected).length;
-  const introText = st.kind === "contractor"
-    ? `بناءً على التقرير رقم ${r.reportNo} المؤرخ ${formatDate(r.date)} الخاص بالمشروع ${p.name} (رقم المشروع ${p.projectNo})، تبين من الفحوصات المخبرية أن العينات الموضحة أدناه غير مطابقة للأسس المعتمدة (الإصدار 2023 م). نرجو التكرم بتصويبها وإعادة الفحص، واتخاذ الإجراءات اللازمة لتفادي تكرارها.`
-    : `إشارة إلى التقرير رقم ${r.reportNo} المؤرخ ${formatDate(r.date)}، نحيطكم علماً بأن (${rejectedCount}) من الفحوصات المخبرية للمشروع ${p.name} (رقم المشروع ${p.projectNo}) رُفضت وفق أسس القبول المعتمدة (الإصدار 2023 م)، وتبلغ قيمة الحسميات المرتبطة بالفحوصات المحددة ${formatMoney(totals.deduction)} د.أ. ونوصي بإحالة الموضوع إلى المقاول لتصويبها وإعادة الفحص قبل اعتماد الاستلام النهائي.`;
-
-  const toBlock = st.kind === "contractor"
-    ? `<div><strong>إلى:</strong> ${escHTML(p.contractor || "المقاول المعني")}</div>
-       <div><strong>المشروع:</strong> ${escHTML(p.name)} — <span dir="ltr">${escHTML(p.projectNo)}</span></div>
-       <div><strong>الموضوع:</strong> ${escHTML(def.subject)}</div>`
-    : `<div><strong>إلى:</strong> سعادة مدير أشغال محافظة مأدبا المحترم</div>
-       <div><strong>من:</strong> رئيس قسم مختبر مديرية أشغال محافظة مأدبا</div>
-       <div><strong>المشروع:</strong> ${escHTML(p.name)} — <span dir="ltr">${escHTML(p.projectNo)}</span></div>
-       <div><strong>الموضوع:</strong> ${escHTML(def.subject)}</div>`;
-
-  const sigBlocks = st.kind === "contractor"
-    ? [
-        ["أعدّ الكتاب", "مهندس المختبر / مختبر الطرق", "الاسم: ................................."],
-        ["تدقيق ومراجعة", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا", "الاسم: م.براءة الغليلات"]
-      ]
-    : [["تدقيق ومراجعة", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا", "الاسم: م.براءة الغليلات"]];
-
-  const signaturesHTML = `
-    <div class="rp-signatures${st.kind === "memo" ? " rp-signatures-single" : ""}"${sigBlocks.length > 1 ? ` style="grid-template-columns:repeat(${sigBlocks.length}, 1fr);"` : ""}>
-      ${sigBlocks.map((b) => `
-        <div>
-          <div>${b[0]}</div>
-          <div class="rp-sig-line"><strong>${b[1]}</strong><div>${b[2]}</div></div>
-        </div>`).join("")}
-    </div>`;
+  const rawPoints = (st.note && st.note.trim()) ? st.note.trim() : buildDefaultMemoPoints(items);
+  const pointLines = rawPoints.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const fromText = st.fromText || "رئيس قسم المختبر / م.براءة الغليلات";
+  const toText = st.toText || "مدير أشغال محافظة مادبا";
+  const subjectText = st.subject || buildDefaultMemoSubject(p);
 
   return `
-  <div class="report-paper">
-    <div class="rp-official-header">
-      <div class="rp-emblem">${getReportEmblemHTML()}</div>
-      <div class="rp-header-center">
-        <div class="rp-kingdom">المملكة الأردنية الهاشمية</div>
-        <div class="rp-ministry">وزارة الأشغال العامة والإسكان</div>
-        <div class="rp-directorate">مديرية أشغال محافظة مأدبا</div>
-        <div class="rp-kingdom">المختبر المركزي-الحسميات والشذوذات</div>
-      </div>
-      <div class="rp-ref-box">
-        <div>${def.docLabel} رقم: <span dir="ltr">${escHTML(st.docNo)}</span></div>
-        <div>التاريخ: <input type="text" class="rp-date-input" dir="ltr" value="${escHTML(formatDate(st.date))}" onchange="updateCorrespondencePreviewDate(this)" title="بصيغة يوم/شهر/سنة — مثال: 1/9/2026" /></div>
-        <div>رقم التقرير: <span dir="ltr">${escHTML(r.reportNo)}</span></div>
-        <div>رقم المشروع: <span dir="ltr">${escHTML(p.projectNo)}</span></div>
+  <div class="report-paper memo-official-paper">
+    <div class="memo-top-header">
+      <div class="memo-emblem rp-emblem">${getReportEmblemHTML()}</div>
+      <div class="memo-title-block">
+        <div class="memo-ministry">وزارة الأشغال العامة والإسكان</div>
+        <div class="memo-doc-title">مذكرة داخلية</div>
       </div>
     </div>
 
-    <div class="rp-title">${escHTML(def.title)}</div>
-    <div class="rp-subtitle">${escHTML(def.subtitle)}</div>
-
-    <div class="rp-letter-to">${toBlock}</div>
-    <div class="rp-letter-text">${escHTML(introText)}</div>
-
-    <div class="rp-section-title">الفحوصات المحددة</div>
-    <table class="rp-table">
-      <thead><tr><th>#</th><th>الموقع / العينة</th><th>الجدول</th><th>الفحص المخبري</th><th>القرار</th><th>الحسم (د.أ)</th><th>الإجراء المطلوب</th></tr></thead>
+    <table class="memo-routing-table">
+      <thead>
+        <tr>
+          <th style="width:38%;"></th>
+          <th style="width:32%;"></th>
+          <th style="width:15%;">التوقيع</th>
+          <th style="width:15%;">التاريخ</th>
+        </tr>
+      </thead>
       <tbody>
-        ${items.map((it, idx) => `
-          <tr>
-            <td>${idx + 1}</td>
-            <td>${escHTML(it.location)}</td>
-            <td>${escHTML(tableRefText(it))}</td>
-            <td>${escHTML(it.itemName)}</td>
-            <td>${it.anyRejected ? "مرفوض" : escHTML(it.finalDecision || "---")}</td>
-            <td><span class="rp-num">${formatMoney(it.totalDeduction)}</span></td>
-            <td class="rp-letter-action">${it.anyRejected ? "تصويب الفحص وإعادة أخذ عينة" : "مراجعة النتيجة ومتابعتها"}</td>
-          </tr>`).join("")}
-        <tr style="background:#f1f5f9;font-weight:800;">
-          <td colspan="5">الإجمالي (${items.length} فحص)</td>
-          <td><span class="rp-num">${formatMoney(totals.deduction)}</span></td>
-          <td>---</td>
+        <tr>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">من</span>
+              <span class="memo-line-fill align-right">${escHTML(fromText)}</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">&nbsp;</span>
+              <span class="memo-line-fill">${escHTML(toText)}</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">
+                <input type="text" class="rp-date-input memo-date-input" dir="ltr" value="${escHTML(formatDate(st.date))}" onchange="updateCorrespondencePreviewDate(this)" title="بصيغة يوم/شهر/سنة — مثال: 23/11/2026" />
+              </span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">من</span>
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">إلى</span>
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">من</span>
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">إلى</span>
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <div class="rp-letter-summary">
-      <span>عدد الفحوصات المحددة: ${items.length}</span>
-      <span>منها مرفوضة: ${rejectedCount}</span>
-      <span>قيمة الحسم: <span class="rp-num">${formatMoney(totals.deduction)}</span> د.أ</span>
+    <div class="memo-subject-wrap">
+      <span>الموضوع :- </span><span class="memo-subject-text">${escHTML(subjectText)}</span>
     </div>
 
-    <div class="rp-note-official"><strong>ملاحظة:</strong> الكميات كما وردتنا من قسم المساحة والدراسات</div>
-    ${st.note ? `<div class="rp-letter-extra">${escHTML(st.note)}</div>` : ""}
+    <div class="memo-body-intro">
+      إشارة إلى موضوع البحث أعلاه ، بخصوص الحسميات على الشذوذات في الفحوصات المخبرية التابعه للعطاء مدار البحث. واستنادا إلى أسس القبول والقبول مع الحسم والرفض لمشاريع الطرق عام 2024.
+    </div>
 
-    ${signaturesHTML}
+    <div class="memo-body-notice">
+      * أرجو العلم أن قيمة الحسم كما هو موضح بالمرفق كــــــــــــــــــــما يلي :
+    </div>
 
-    <div class="rp-footer">
-      مديرية أشغال محافظة مأدبا — المختبر المركزي-الحسميات والشذوذات — وزارة الأشغال العامة والإسكان | ${def.docLabel} رقم: ${escHTML(st.docNo)} | صفحة 1 من 1
+    <div class="memo-points-block">
+      ${pointLines.map((line) => `<div class="memo-point-line">${escHTML(line)}</div>`).join("")}
+    </div>
+
+    <div class="memo-closing">وتفضلوا الاحترام ،،،</div>
+
+    <div class="memo-cc-block">
+      <div>نسخه/ نسخه/ رئيس قسم المــــــــــــــــــــختبر</div>
+      <div>نسخه / للــــــــــــــــــــــــــــــــــــــــملف</div>
     </div>
   </div>`;
 }
@@ -2152,7 +2232,7 @@ function previewCorrespondence() {
   if (!ctx) return;
   correspondenceState.html = buildCorrespondenceHTML(ctx.project, ctx.report, ctx.state);
   document.getElementById("correspondencePreviewTitle").textContent =
-    `${CORRESPONDENCE_DEFS[ctx.state.kind].label} — ${ctx.state.docNo}`;
+    `${CORRESPONDENCE_DEFS.memo.label} — ${ctx.state.docNo}`;
   document.getElementById("correspondencePreviewContent").innerHTML = correspondenceState.html;
   closeCorrespondenceModal();
   document.getElementById("correspondencePreviewModal").classList.remove("hidden");
@@ -2218,7 +2298,6 @@ function renderProjectReports(p) {
             <button type="button" class="btn btn-excel btn-sm" onclick="exportReportExcel('${p.id}','${r.id}')">📗 Excel</button>
             <button type="button" class="btn btn-word btn-sm" onclick="exportReportWord('${p.id}','${r.id}')">📘 Word</button>
             <button type="button" class="btn btn-edit btn-sm" onclick="openReportRowsModal('${p.id}','${r.id}')" title="تحديد الصفوف الظاهرة في التقرير">✂️ تحديد الصفوف</button>
-            <button type="button" class="btn btn-edit btn-sm" onclick="openCorrespondenceModal('contractor','${p.id}','${r.id}')" title="كتاب للمقاول بالفحوصات المرفوضة">✉️ كتاب مقاول</button>
             <button type="button" class="btn btn-outline-dark btn-sm" onclick="openCorrespondenceModal('memo','${p.id}','${r.id}')" title="مذكرة داخلية لمدير الأشغال">📝 مذكرة داخلية</button>
             <button type="button" class="btn btn-danger-outline btn-sm" onclick="deleteProjectReport('${p.id}','${r.id}')" title="حذف التقرير">🗑️</button>
           </div>

@@ -2253,7 +2253,7 @@ body {
   .report-dashboard-actions { justify-content: flex-start; }
 }
 
-/* ===== مراسلات المختبر: كتاب للمقاول ومذكرة داخلية ===== */
+/* ===== مذكرة داخلية رسمية (مطابقة للنموذج المعتمد) ===== */
 .correspondence-modal-card { width: min(100%, 900px); }
 
 .correspondence-fields {
@@ -2261,6 +2261,157 @@ body {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 12px;
+}
+
+.correspondence-fields-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.memo-official-paper {
+  padding: 16mm 18mm !important;
+  font-size: 12pt !important;
+  line-height: 1.9 !important;
+  color: #111 !important;
+}
+
+.memo-top-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  margin-bottom: 8px;
+}
+
+.memo-emblem img,
+.memo-emblem svg {
+  width: 84px !important;
+  height: 84px !important;
+  object-fit: contain;
+  display: block;
+}
+
+.memo-title-block {
+  text-align: center;
+}
+
+.memo-ministry {
+  font-size: 16pt;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.35;
+}
+
+.memo-doc-title {
+  font-size: 15pt;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.35;
+}
+
+.memo-routing-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 11pt;
+  font-weight: 700;
+  direction: rtl;
+}
+
+.memo-routing-table th {
+  font-size: 11pt;
+  font-weight: 800;
+  text-align: center;
+  padding: 0 6px 2px;
+  color: #111;
+}
+
+.memo-routing-table td {
+  padding: 5px 6px 3px;
+  vertical-align: bottom;
+}
+
+.memo-cell-inner {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.memo-tag {
+  font-weight: 800;
+  white-space: nowrap;
+  min-width: 22px;
+}
+
+.memo-line-fill {
+  flex: 1;
+  border-bottom: 1px solid #222;
+  min-height: 22px;
+  padding: 0 6px 2px;
+  text-align: center;
+}
+
+.memo-line-fill.align-right {
+  text-align: right;
+}
+
+.memo-date-input {
+  width: 115px !important;
+  font-size: 11pt !important;
+  font-weight: 800 !important;
+}
+
+.memo-subject-wrap {
+  margin: 34px 12% 26px 6%;
+  font-size: 13pt;
+  font-weight: 800;
+  line-height: 2;
+  text-align: right;
+}
+
+.memo-subject-text {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.memo-body-intro {
+  font-size: 12.5pt;
+  font-weight: 700;
+  line-height: 2;
+  text-align: justify;
+  margin: 22px 0 14px;
+}
+
+.memo-body-notice {
+  font-size: 12.5pt;
+  font-weight: 700;
+  line-height: 2;
+  margin: 12px 24px 18px 0;
+}
+
+.memo-points-block {
+  font-size: 12.5pt;
+  font-weight: 800;
+  line-height: 2.1;
+  margin: 18px 0 38px;
+}
+
+.memo-point-line {
+  margin-bottom: 8px;
+}
+
+.memo-closing {
+  text-align: center;
+  font-size: 13pt;
+  font-weight: 800;
+  margin: 56px 0 85px;
+}
+
+.memo-cc-block {
+  text-align: right;
+  font-size: 10.5pt;
+  font-weight: 700;
+  line-height: 1.9;
+  margin-top: 60px;
 }
 
 .correspondence-fields label,
@@ -5012,7 +5163,6 @@ input[inputmode="decimal"] {
       <div id="reportSignatureOptions" class="sig-options-bar"></div>
       <div class="report-modal-buttons">
         <button type="button" class="btn btn-edit btn-sm" onclick="openReportRowsModal(currentPrintProjectId, currentPrintReportId)" title="تحديد الصفوف الظاهرة في التقرير">✂️ تحديد الصفوف</button>
-        <button type="button" class="btn btn-edit btn-sm" onclick="openCorrespondenceModal('contractor', currentPrintProjectId, currentPrintReportId)" title="كتاب للمقاول بالفحوصات المرفوضة">✉️ كتاب مقاول</button>
         <button type="button" class="btn btn-outline-dark btn-sm" onclick="openCorrespondenceModal('memo', currentPrintProjectId, currentPrintReportId)" title="مذكرة داخلية لمدير الأشغال">📝 مذكرة داخلية</button>
         <button type="button" class="btn btn-primary btn-sm" onclick="printReportFromModal()">🖨️ طباعة التقرير</button>
         <button type="button" class="btn btn-excel btn-sm" onclick="exportCurrentReportExcel()">📗 Excel</button>
@@ -5049,41 +5199,48 @@ input[inputmode="decimal"] {
     </div>
   </div>
 
-  <!-- نافذة إصدار كتاب للمقاول أو مذكرة داخلية لمدير الأشغال -->
+  <!-- نافذة إصدار مذكرة داخلية لمدير الأشغال -->
   <div id="correspondenceModal" class="edit-modal hidden no-print" role="dialog" aria-modal="true" aria-labelledby="correspondenceModalTitle">
     <div class="edit-modal-card correspondence-modal-card">
       <div class="edit-modal-header">
-        <strong id="correspondenceModalTitle">إصدار مراسلة</strong>
+        <strong id="correspondenceModalTitle">إصدار مذكرة داخلية</strong>
         <button type="button" class="edit-modal-close" onclick="closeCorrespondenceModal()" aria-label="إغلاق">✖</button>
       </div>
       <div class="edit-modal-body">
         <input type="hidden" id="correspondenceProjectId" />
         <input type="hidden" id="correspondenceReportId" />
         <input type="hidden" id="correspondenceKind" />
-        <div class="correspondence-fields">
-          <label>رقم المراسلة:
-            <input type="text" id="correspondenceDocNo" class="form-control" dir="ltr" lang="en" />
+        <input type="hidden" id="correspondenceDocNo" />
+        <div class="correspondence-fields correspondence-fields-3">
+          <label>من:
+            <input type="text" id="correspondenceFrom" class="form-control" value="رئيس قسم المختبر / م.براءة الغليلات" />
+          </label>
+          <label>إلى:
+            <input type="text" id="correspondenceTo" class="form-control" value="مدير أشغال محافظة مادبا" />
           </label>
           <label>التاريخ (يوم/شهر/سنة):
-            <input type="text" id="correspondenceDate" class="form-control rp-date-input" dir="ltr" lang="en" onchange="normalizeCorrespondenceDate(this)" title="بصيغة يوم/شهر/سنة — مثال: 1/9/2026" />
+            <input type="text" id="correspondenceDate" class="form-control rp-date-input" dir="ltr" lang="en" onchange="normalizeCorrespondenceDate(this)" title="بصيغة يوم/شهر/سنة — مثال: 23/11/2026" />
           </label>
         </div>
+        <label class="correspondence-note-field" style="margin-top:0;margin-bottom:10px;">الموضوع :-
+          <textarea id="correspondenceSubject" class="form-control" rows="2"></textarea>
+        </label>
         <div id="correspondenceIntro" class="correspondence-intro"></div>
         <div class="correspondence-quick">
-          <span class="rr-rows-label">الفحوصات:</span>
+          <span class="rr-rows-label">الفحوصات المحتسبة في المذكرة:</span>
           <button type="button" class="btn btn-secondary btn-sm" onclick="toggleAllCorrespondenceItems(true)">تحديد الكل</button>
           <button type="button" class="btn btn-edit btn-sm" onclick="selectRejectedCorrespondenceItems()">المرفوضة فقط</button>
           <button type="button" class="btn btn-outline-dark btn-sm" onclick="toggleAllCorrespondenceItems(false)">إلغاء التحديد</button>
           <span id="correspondenceCount" class="correspondence-count">المحدد: 0</span>
         </div>
         <div id="correspondenceItemsList" class="report-rows-list"></div>
-        <label class="correspondence-note-field">ملاحظة إضافية تُدرج في المراسلة (اختياري):
-          <textarea id="correspondenceNote" class="form-control" rows="2" placeholder="مثال: يرجى التصويب وإعادة الفحص خلال أسبوع عمل واحد."></textarea>
+        <label class="correspondence-note-field">بنود قيمة الحسم في المذكرة (تُحدَّث تلقائياً حسب الفحوصات المحددة ويمكنك تعديلها):
+          <textarea id="correspondenceNote" class="form-control" rows="2"></textarea>
         </label>
       </div>
       <div class="edit-modal-footer">
         <button type="button" class="btn btn-secondary btn-sm" onclick="closeCorrespondenceModal()">إلغاء</button>
-        <button type="button" class="btn btn-primary btn-sm" onclick="previewCorrespondence()">👁️ معاينة المراسلة</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="previewCorrespondence()">👁️ معاينة المذكرة الداخلية</button>
       </div>
     </div>
   </div>
@@ -7540,6 +7697,17 @@ function buildDocxStyles() {
   const center = '<w:jc w:val="center"/>';
   const sectionBorder = '<w:pBdr><w:right w:val="single" w:sz="24" w:space="4" w:color="C59B27"/></w:pBdr>';
   const styles = [
+    `<w:style w:type="paragraph" w:default="1" w:styleId="Normal">${wStyle("Normal", "Normal", { size: 11, color: "111111" })}`,
+    wStyle("MemoMinistry", "Memo Ministry", { size: 16, bold: true, color: "111111", pPr: '<w:jc w:val="center"/><w:spacing w:after="60"/>' }),
+    wStyle("MemoDocTitle", "Memo Doc Title", { size: 15, bold: true, color: "111111", pPr: '<w:jc w:val="center"/><w:spacing w:before="600" w:after="600"/>' }),
+    wStyle("MemoCellRight", "Memo Cell Right", { size: 11, bold: true, color: "111111", pPr: '<w:jc w:val="right"/>' }),
+    wStyle("MemoCellCenter", "Memo Cell Center", { size: 11, bold: true, color: "111111", pPr: '<w:jc w:val="center"/>' }),
+    wStyle("MemoSubject", "Memo Subject", { size: 13, bold: true, color: "111111", pPr: '<w:ind w:left="500" w:right="180"/><w:spacing w:before="400" w:after="300" w:line="360" w:lineRule="auto"/><w:rPr><w:u w:val="single"/></w:rPr>' }),
+    wStyle("MemoBody", "Memo Body", { size: 12.5, bold: true, color: "111111", pPr: '<w:ind w:left="500"/><w:spacing w:before="200" w:after="160" w:line="360" w:lineRule="auto"/><w:jc w:val="both"/>' }),
+    wStyle("MemoNotice", "Memo Notice", { size: 12.5, bold: true, color: "111111", pPr: '<w:ind w:left="380"/><w:spacing w:before="180" w:after="200" w:line="360" w:lineRule="auto"/>' }),
+    wStyle("MemoPoint", "Memo Point", { size: 12.5, bold: true, color: "111111", pPr: '<w:spacing w:before="140" w:after="160" w:line="340" w:lineRule="auto"/>' }),
+    wStyle("MemoClosing", "Memo Closing", { size: 13, bold: true, color: "111111", pPr: '<w:jc w:val="center"/><w:spacing w:before="700" w:after="950"/>' }),
+    wStyle("MemoCC", "Memo CC", { size: 11, bold: true, color: "111111", pPr: '<w:jc w:val="right"/><w:spacing w:after="80"/>' }),
     `<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:pPr><w:bidi/><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr>${wRunProps(8, false, "111111")}</w:rPr></w:style>`,
     wStyle("RPKingdom", "RP Kingdom", { size: 9, bold: true, pPr: center }),
     wStyle("RPMinistry", "RP Ministry", { size: 12, bold: true, color: "2B4922", pPr: center }),
@@ -7559,9 +7727,135 @@ function buildDocxStyles() {
     wStyle("RPSigLabel", "RP Signature Label", { size: 8, pPr: center }),
     wStyle("RPSigName", "RP Signature Name", { size: 8, bold: true, color: "1E3518", pPr: center }),
     wStyle("RPSigSub", "RP Signature Sub", { size: 8, pPr: center }),
-    wStyle("RPFooter", "RP Footer", { size: 7, color: "475569", pPr: center })
+    wStyle("RPFooter", "RP Footer", { size: 7, color: "475569", pPr: center }),
+    wStyle("MemoMinistry", "Memo Ministry", { size: 15, bold: true, color: "111111", pPr: center }),
+    wStyle("MemoDocTitle", "Memo Doc Title", { size: 15, bold: true, color: "111111", pPr: center }),
+    wStyle("MemoCellRight", "Memo Cell Right", { size: 11, bold: true, color: "111111" }),
+    wStyle("MemoCellCenter", "Memo Cell Center", { size: 11, bold: true, color: "111111", pPr: center }),
+    wStyle("MemoSubject", "Memo Subject", { size: 13, bold: true, color: "111111", pPr: '<w:ind w:right="720" w:left="420"/><w:spacing w:before="440" w:after="360" w:line="360" w:lineRule="auto"/>', rPr: '<w:u w:val="single"/>' }),
+    wStyle("MemoBody", "Memo Body", { size: 12.5, bold: true, color: "111111", pPr: '<w:jc w:val="both"/><w:spacing w:before="240" w:after="200" w:line="380" w:lineRule="auto"/>' }),
+    wStyle("MemoNotice", "Memo Notice", { size: 12.5, bold: true, color: "111111", pPr: '<w:ind w:right="360"/><w:spacing w:before="180" w:after="200" w:line="380" w:lineRule="auto"/>' }),
+    wStyle("MemoPoint", "Memo Point", { size: 12.5, bold: true, color: "111111", pPr: '<w:spacing w:before="140" w:after="160" w:line="380" w:lineRule="auto"/>' }),
+    wStyle("MemoClosing", "Memo Closing", { size: 13, bold: true, color: "111111", pPr: center + '<w:spacing w:before="720" w:after="960"/>' }),
+    wStyle("MemoCC", "Memo CC", { size: 10.5, bold: true, color: "111111", pPr: '<w:spacing w:before="80" w:after="80" w:line="320" w:lineRule="auto"/>' })
   ];
   return `${xmlHeader()}<w:styles xmlns:w="${OOXML_XMLNS.word}">${styles.join("")}</w:styles>`;
+}
+
+function wPUnicodeDotG(opts = {}) {
+  return `<w:p>${opts.pPr || ""}<w:r><w:t xml:space="preserve">· ع </w:t></w:r></w:p>`;
+}
+
+function buildMemoDocxHeader(logo) {
+  return `${xmlHeader()}
+<w:hdr xmlns:w="${OOXML_XMLNS.word}" xmlns:r="${OOXML_XMLNS.officeRel}" xmlns:wp="${OOXML_XMLNS.wp}" xmlns:a="${OOXML_XMLNS.drawing}" xmlns:pic="${OOXML_XMLNS.pic}">
+  ${wTbl([wTr([
+    wTc(logo ? [wLogoDrawing(logo, "rId1")] : [wP("🏛️", "MemoMinistry")], 2000, "MemoMinistry"),
+    wTc([wP("وزارة الأشغال العامة والإسكان", "MemoMinistry"), wP("مذكرة داخلية", "MemoDocTitle")], 4000, "MemoMinistry")
+  ])], [2000, 4000])}
+</w:hdr>`;
+}
+
+function buildMemoDocxFooter() {
+  return `${xmlHeader()}<w:ftr xmlns:w="${OOXML_XMLNS.word}"><w:p><w:pPr><w:jc w:val="right"/></w:pPr></w:p></w:ftr>`;
+}
+
+function buildMemoDocx(p, report, meta, items, points) {
+  const docNo = (meta && meta.docNo) || `${p.projectNo}/مذكرة/${String(report.serialNumber).padStart(3, "0")}`;
+  const memoDate = typeof ltrDate === "function" ? ltrDate((meta && meta.date) || report.date) : formatDate((meta && meta.date) || report.date);
+  const fromText = (meta && meta.fromText) || "رئيس قسم المختبر / م.براءة الغليلات";
+  const toText = (meta && meta.toText) || "مدير أشغال محافظة مادبا";
+  const subjectText = (meta && meta.subject) || (typeof buildDefaultMemoSubject === "function" ? buildDefaultMemoSubject(p) : `عطاء رقم ${p.projectNo} الخاص بـ ${p.name}`);
+  const logo = getReportLogoImage();
+  const thin = { top: { sz: 6 }, left: {}, bottom: {}, right: {} };
+  const body = [];
+  const colWidths = [3800, 3000, 1600, 1600];
+
+  body.push(wTbl([
+    wTr([wTc("", colWidths[0], "MemoCellRight", { shade: "F8FAFC", borders: thin }), wTc("", colWidths[1], "MemoCellCenter", { shade: "F8FAFC", borders: thin }), wTc("التوقيع", colWidths[2], "MemoCellCenter", { shade: "F8FAFC", borders: thin }), wTc("التاريخ", colWidths[3], "MemoCellCenter", { shade: "F8FAFC", borders: thin })]),
+    wTr([
+      wTc(`من   ${fromText}`, colWidths[0], "MemoCellRight", { shade: "F2E8CF", borders: thin }),
+      wTc(toText, colWidths[1], "MemoCellCenter", { shade: "F2E8CF", borders: thin }),
+      wTc(" ", colWidths[2], "MemoCellCenter", { shade: "F2E8CF", borders: thin }),
+      wTc(memoDate, colWidths[3], "MemoCellCenter", { shade: "F2E8CF", borders: thin })
+    ]),
+    wTr([
+      wTc("من", colWidths[0], "MemoCellRight", { borders: thin }),
+      wTc("إلى", colWidths[1], "MemoCellRight", { borders: thin }),
+      wTc(" ", colWidths[2], "MemoCellCenter", { borders: thin }),
+      wTc(" ", colWidths[3], "MemoCellCenter", { borders: thin })
+    ]),
+    wTr([
+      wTc("من", colWidths[0], "MemoCellRight", { borders: thin }),
+      wTc("إلى", colWidths[1], "MemoCellRight", { borders: thin }),
+      wTc(" ", colWidths[2], "MemoCellCenter", { borders: thin }),
+      wTc(" ", colWidths[3], "MemoCellCenter", { borders: thin })
+    ])
+  ], colWidths));
+
+  body.push(wP(`الموضوع :- ${subjectText}`, "MemoSubject"));
+  body.push(wPUnicodeDotG());
+  body.push(wP("إشارة إلى موضوع البحث أعلاه ، بخصوص الحسميات على الشذوذات في الفحوصات المخبرية التابعه للعطاء مدار البحث. واستنادا إلى أسس القبول والقبول مع الحسم والرفض لمشاريع الطرق عام 2024.", "MemoBody"));
+  body.push(wP("* أرجو العلم أن قيمة الحسم كما هو موضح بالمرفق كــــــــــــــــــــما يلي :", "MemoNotice"));
+  (points || []).forEach((line) => body.push(wP(line, "MemoPoint")));
+  body.push(wPUnicodeDotG());
+  body.push(wP("وتفضلوا الاحترام ،،،", "MemoClosing"));
+  body.push(wP("نسخه/ نسخه/ رئيس قسم المــــــــــــــــــــختبر", "MemoCC"));
+  body.push(wP("نسخه / للــــــــــــــــــــــــــــــــــــــــملف", "MemoCC"));
+
+  const document = `${xmlHeader()}
+<w:document xmlns:w="${OOXML_XMLNS.word}" xmlns:r="${OOXML_XMLNS.officeRel}" xmlns:wp="${OOXML_XMLNS.wp}" xmlns:a="${OOXML_XMLNS.drawing}" xmlns:pic="${OOXML_XMLNS.pic}">
+  <w:body>
+    ${body.join("")}
+    <w:sectPr>
+      <w:headerReference w:type="default" r:id="rId1"/>
+      <w:footerReference w:type="default" r:id="rId2"/>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="720" w:right="900" w:bottom="720" w:left="900" w:header="360" w:footer="360" w:gutter="0"/>
+      <w:bidi/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+  const parts = [
+    { name: "[Content_Types].xml", data: `${xmlHeader()}
+<Types xmlns="${OOXML_XMLNS.ct}">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
+  <Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>` },
+    { name: "_rels/.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/officeDocument" Target="word/document.xml"/>
+  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/extended-properties" Target="docProps/app.xml"/>
+</Relationships>` },
+    { name: "word/document.xml", data: document },
+    { name: "word/styles.xml", data: buildDocxStyles() },
+    { name: "word/header1.xml", data: buildMemoDocxHeader(logo) },
+    { name: "word/footer1.xml", data: buildMemoDocxFooter() },
+    { name: "word/_rels/document.xml.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/header" Target="header1.xml"/>
+  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/footer" Target="footer1.xml"/>
+  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/styles" Target="styles.xml"/>
+</Relationships>` },
+    { name: "word/_rels/header1.xml.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/image" Target="media/logo.png"/>
+</Relationships>` },
+    { name: "docProps/core.xml", data: officeCoreProps(docNo) },
+    { name: "docProps/app.xml", data: officeAppProps("Microsoft Office Word") }
+  ];
+  if (logo) parts.push({ name: "word/media/logo.png", data: logo.bytes });
+
+  return ooxmlZip(parts);
 }
 
 function wP(text, style, opts) {
@@ -7798,159 +8092,11 @@ function buildDocx(p, report, view) {
 
 /* ==================== كتاب المقاول / المذكرة الداخلية (docx حقيقي) ==================== */
 function buildCorrespondenceDocx(kind, p, report, items, meta) {
-  const isContractor = kind === "contractor";
-  const def = (typeof CORRESPONDENCE_DEFS !== "undefined" && CORRESPONDENCE_DEFS[kind])
-    ? CORRESPONDENCE_DEFS[kind]
-    : {
-        docLabel: isContractor ? "كتاب" : "مذكرة",
-        title: isContractor ? "كتاب إلى المقاول بشأن الفحوصات المرفوضة" : "مذكرة داخلية إلى مدير أشغال محافظة مأدبا",
-        subject: ""
-      };
-  const docLabel = `${def.docLabel} رقم:`;
-  const docNo = meta.docNo || `${p.projectNo}/${def.docLabel}/${String(report.serialNumber).padStart(3, "0")}`;
-  const ref = { reportNo: docNo, serialNumber: report.serialNumber, date: meta.date || report.date };
-  const logo = getReportLogoImage();
-  const t = computeTotals(items);
-  const rejectedCount = items.filter((it) => it.anyRejected).length;
-  const thin = { top: {}, left: {}, bottom: {}, right: {} };
-  const body = [];
-
-  body.push(wP(def.title, "RPTitle", { keepNext: true }));
-  body.push(wP(`${docLabel} ${docNo} — التاريخ: ${formatDate(ref.date)} — رقم التقرير: ${report.reportNo}`, "RPSubtitle"));
-
-  body.push(wP(isContractor ? "إلى" : "إلى / من", "RPSection", { keepNext: true }));
-  const toRows = isContractor
-    ? [
-        ["المقاول:", p.contractor || "المقاول المعني"],
-        ["المشروع:", `${p.name} — ${p.projectNo}`],
-        ["الموضوع:", def.subject]
-      ]
-    : [
-        ["إلى:", "سعادة مدير أشغال محافظة مأدبا المحترم"],
-        ["من:", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا"],
-        ["المشروع:", `${p.name} — ${p.projectNo}`],
-        ["الموضوع:", def.subject]
-      ];
-  body.push(wTbl(toRows.map((row) => wTr([
-    wTc(row[0], 1500, "RPMetaLabel", { shade: "F1F5F9", borders: thin }),
-    wTc(row[1], 9300, "RPMetaValue", { borders: thin })
-  ])), [1500, 9300]));
-
-  body.push(wP("النص", "RPSection", { keepNext: true }));
-  const intro = isContractor
-    ? `بناءً على التقرير رقم ${report.reportNo} المؤرخ ${formatDate(report.date)} الخاص بالمشروع ${p.name} (رقم المشروع ${p.projectNo})، تبين من الفحوصات المخبرية أن العينات الموضحة أدناه غير مطابقة للأسس المعتمدة (الإصدار 2023 م). نرجو التكرم بتصويبها وإعادة الفحص، واتخاذ الإجراءات اللازمة لتفادي تكرارها.`
-    : `إشارة إلى التقرير رقم ${report.reportNo} المؤرخ ${formatDate(report.date)}، نحيطكم علماً بأن (${rejectedCount}) من الفحوصات المخبرية للمشروع ${p.name} (رقم المشروع ${p.projectNo}) رُفضت وفق أسس القبول المعتمدة (الإصدار 2023 م)، وتبلغ قيمة الحسميات المرتبطة بالفحوصات المحددة ${formatMoney(t.deduction)} د.أ. ونوصي بإحالة الموضوع إلى المقاول لتصويبها وإعادة الفحص قبل اعتماد الاستلام النهائي.`;
-  body.push(wP(intro, "RPMetaValue"));
-
-  body.push(wP("الفحوصات المحددة", "RPSection", { keepNext: true }));
-  const widths = [420, 2000, 900, 1800, 1800, 900, 2980];
-  const heads = ["#", "الموقع / العينة", "الجدول", "الفحص المخبري", "القرار", "الحسم (د.أ)", "الإجراء المطلوب"];
-  const tableRows = [wTr(heads.map((h) => wTc(h, widths[heads.indexOf(h)], "RPTableHeader", { shade: "E4DAC4", borders: thin })), { header: true })];
-  items.forEach((it, idx) => {
-    const shade = idx % 2 === 1 ? "F8FAFC" : null;
-    tableRows.push(wTr([
-      wTc(String(idx + 1), widths[0], "RPTableCell", { shade, borders: thin }),
-      wTc(it.location, widths[1], "RPTableCell", { shade, borders: thin }),
-      wTc(tableRefText(it), widths[2], "RPTableCell", { shade, borders: thin }),
-      wTc(it.itemName, widths[3], "RPTableCell", { shade, borders: thin }),
-      wTc(it.anyRejected ? "مرفوض" : (it.finalDecision || "---"), widths[4], "RPTableCell", { shade, borders: thin }),
-      wTc(formatMoney(it.totalDeduction), widths[5], "RPTableNum", { shade, borders: thin }),
-      wTc(it.anyRejected ? "تصويب الفحص وإعادة أخذ عينة" : "مراجعة النتيجة ومتابعتها", widths[6], "RPTableCell", { shade, borders: thin })
-    ]));
-  });
-  tableRows.push(wTr([
-    wTc(`الإجمالي (${items.length} فحص)`, widths[0] + widths[1] + widths[2] + widths[3] + widths[4], "RPTableCell", { shade: "F1F5F9", borders: thin }),
-    wTc(formatMoney(t.deduction), widths[5], "RPTableNum", { shade: "F1F5F9", borders: thin }),
-    wTc("---", widths[6], "RPTableCell", { shade: "F1F5F9", borders: thin })
-  ]));
-  body.push(wTbl(tableRows, widths));
-
-  body.push(wP("", "RPSumValue", { pPr: '<w:spacing w:before="60"/>' }));
-  body.push(wTbl([
-    wTr([
-      wTc("عدد الفحوصات المحددة", 3600, "RPSumLabel", { borders: thin }),
-      wTc("منها مرفوضة", 3600, "RPSumLabel", { borders: thin }),
-      wTc("قيمة الحسم (د.أ)", 3600, "RPSumLabel", { shade: "FEF3C7", borders: thin })
-    ]),
-    wTr([
-      wTc(String(items.length), 3600, "RPSumValue", { borders: thin }),
-      wTc(String(rejectedCount), 3600, "RPSumValue", { borders: thin }),
-      wTc(formatMoney(t.deduction), 3600, "RPSumValue", { shade: "FEF3C7", borders: thin })
-    ])
-  ], [3600, 3600, 3600]));
-
-  body.push(wP([{ text: "ملاحظة: ", bold: true }, { text: "الكميات كما وردتنا من قسم المساحة والدراسات", bold: true }], "RPNote", {
-    pPr: '<w:pBdr><w:top w:val="single" w:sz="6" w:space="2" w:color="94A3B8"/><w:left w:val="single" w:sz="6" w:space="2" w:color="94A3B8"/><w:bottom w:val="single" w:sz="6" w:space="2" w:color="94A3B8"/><w:right w:val="single" w:sz="6" w:space="2" w:color="94A3B8"/></w:pBdr><w:shd w:val="clear" w:fill="F8FAFC"/><w:spacing w:before="140" w:after="80"/>'
-  }));
-  if (meta.note) body.push(wP(meta.note, "RPNote", { pPr: '<w:spacing w:before="80"/>' }));
-
-  const signatureBlocks = isContractor
-    ? [
-        ["أعدّ الكتاب", "مهندس المختبر / مختبر الطرق", "الاسم: ................................."],
-        ["تدقيق ومراجعة", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا", "الاسم: م.براءة الغليلات"]
-      ]
-    : [["تدقيق ومراجعة", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا", "الاسم: م.براءة الغليلات"]];
-  const sigWidths = signatureBlocks.length === 2 ? [5400, 5400] : [10800];
-  body.push(wP("", "RPSigLabel", { pPr: '<w:spacing w:before="60"/>' }));
-  body.push(wTbl([wTr(signatureBlocks.map((b, i) => wTc([
-    wP(b[0], "RPSigLabel", { pPr: '<w:spacing w:before="180" />' }),
-    wP(b[1], "RPSigName", { pPr: '<w:pBdr><w:top w:val="single" w:sz="6" w:space="4" w:color="334155"/></w:pBdr><w:spacing w:before="10" w:after="40"/>' }),
-    wP(b[2], "RPSigSub")
-  ], sigWidths[i], "RPSigLabel")), { noSplit: true })], sigWidths));
-
-  const document = `${xmlHeader()}
-<w:document xmlns:w="${OOXML_XMLNS.word}" xmlns:r="${OOXML_XMLNS.officeRel}" xmlns:wp="${OOXML_XMLNS.wp}" xmlns:a="${OOXML_XMLNS.drawing}" xmlns:pic="${OOXML_XMLNS.pic}">
-  <w:body>
-    ${body.join("")}
-    <w:sectPr>
-      <w:headerReference w:type="default" r:id="rId1"/>
-      <w:footerReference w:type="default" r:id="rId2"/>
-      <w:pgSz w:w="11906" w:h="16838"/>
-      <w:pgMar w:top="454" w:right="454" w:bottom="454" w:left="454" w:header="170" w:footer="170" w:gutter="0"/>
-      <w:bidi/>
-    </w:sectPr>
-  </w:body>
-</w:document>`;
-
-  const parts = [
-    { name: "[Content_Types].xml", data: `${xmlHeader()}
-<Types xmlns="${OOXML_XMLNS.ct}">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Default Extension="png" ContentType="image/png"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-  <Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
-  <Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
-  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-</Types>` },
-    { name: "_rels/.rels", data: `${xmlHeader()}
-<Relationships xmlns="${OOXML_XMLNS.rel}">
-  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/officeDocument" Target="word/document.xml"/>
-  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/metadata/core-properties" Target="docProps/core.xml"/>
-  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/extended-properties" Target="docProps/app.xml"/>
-</Relationships>` },
-    { name: "word/document.xml", data: document },
-    { name: "word/styles.xml", data: buildDocxStyles() },
-    { name: "word/header1.xml", data: buildDocxHeader(logo, p, ref, docLabel) },
-    { name: "word/footer1.xml", data: buildDocxFooter(ref, docLabel) },
-    { name: "word/_rels/document.xml.rels", data: `${xmlHeader()}
-<Relationships xmlns="${OOXML_XMLNS.rel}">
-  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/header" Target="header1.xml"/>
-  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/footer" Target="footer1.xml"/>
-  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/styles" Target="styles.xml"/>
-</Relationships>` },
-    { name: "word/_rels/header1.xml.rels", data: `${xmlHeader()}
-<Relationships xmlns="${OOXML_XMLNS.rel}">
-  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/image" Target="media/logo.png"/>
-</Relationships>` },
-    { name: "docProps/core.xml", data: officeCoreProps(docNo) },
-    { name: "docProps/app.xml", data: officeAppProps("Microsoft Office Word") }
-  ];
-  if (logo) parts.push({ name: "word/media/logo.png", data: logo.bytes });
-
-  return ooxmlZip(parts);
+  const rawPoints = (meta && meta.note && meta.note.trim())
+    ? meta.note.trim()
+    : (typeof buildDefaultMemoPoints === "function" ? buildDefaultMemoPoints(items) : "");
+  const points = rawPoints.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return buildMemoDocx(p, report, meta, items, points);
 }
 
 
@@ -9805,7 +9951,6 @@ function renderReportsDashboard() {
                 <button type="button" class="btn btn-excel btn-sm" onclick="exportReportExcel('${p.id}','${r.id}')">📗 Excel</button>
                 <button type="button" class="btn btn-word btn-sm" onclick="exportReportWord('${p.id}','${r.id}')">📘 Word</button>
                 <button type="button" class="btn btn-edit btn-sm" onclick="openReportRowsModal('${p.id}','${r.id}')" title="تحديد الصفوف الظاهرة">✂️ الصفوف</button>
-                <button type="button" class="btn btn-edit btn-sm" onclick="openCorrespondenceModal('contractor','${p.id}','${r.id}')" title="كتاب للمقاول بالفحوصات المرفوضة">✉️ كتاب مقاول</button>
                 <button type="button" class="btn btn-outline-dark btn-sm" onclick="openCorrespondenceModal('memo','${p.id}','${r.id}')" title="مذكرة داخلية لمدير الأشغال">📝 مذكرة داخلية</button>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="openProject('${p.id}')">📁 المشروع</button>
                 <button type="button" class="btn btn-danger-outline btn-sm" onclick="deleteProjectReport('${p.id}','${r.id}')" title="حذف التقرير">🗑️</button>
@@ -9839,25 +9984,49 @@ function renderReportsDashboard() {
     .join("");
 }
 
-/* ==================== مراسلات المختبر: كتاب للمقاول ومذكرة داخلية ==================== */
+/* ==================== مذكرة داخلية رسمية لمدير الأشغال ==================== */
 const CORRESPONDENCE_DEFS = {
-  contractor: {
-    label: "كتاب إلى المقاول",
-    docLabel: "كتاب",
-    title: "كتاب إلى المقاول بشأن الفحوصات المرفوضة",
-    subtitle: "إشعار بتصويب الفحوصات المخبرية غير المطابقة للأسس المعتمدة — الإصدار 2023 م",
-    subject: "إشعار بفحوصات مخبرية مرفوضة وطلب تصويبها"
-  },
   memo: {
     label: "مذكرة داخلية",
     docLabel: "مذكرة",
-    title: "مذكرة داخلية إلى مدير أشغال محافظة مأدبا",
-    subtitle: "إحاطة علماً بنتائج الفحوصات المرفوضة والتوصية بإعادة الفحص — الإصدار 2023 م",
-    subject: "نتائج فحوصات مخبرية مرفوضة والتوصية بإعادة الفحص"
+    title: "مذكرة داخلية",
+    subtitle: "وزارة الأشغال العامة والإسكان",
+    subject: ""
   }
 };
 
 let correspondenceState = null;
+
+function formatMemoDinars(value) {
+  const n = Number(value) || 0;
+  const rounded1 = Math.round(n * 10) / 10;
+  if (Math.abs(rounded1 - Math.round(rounded1)) < 1e-9) return String(Math.round(rounded1));
+  return rounded1.toFixed(1);
+}
+
+function buildDefaultMemoSubject(p) {
+  const no = (p && p.projectNo ? p.projectNo : "").trim();
+  const name = (p && p.name ? p.name : "").trim();
+  if (!name) return `عطاء رقم ${no}`;
+  const prefix = /^[اأإآ]/.test(name) ? "ب" : "بـ ";
+  return `عطاء رقم ${no} الخاص ${prefix}${name}`;
+}
+
+function buildDefaultMemoPoints(items) {
+  const list = items || [];
+  const totals = computeTotals(list);
+  const rejected = list.filter((it) => it.anyRejected);
+  const lines = [];
+  if (totals.deduction > 0 || !rejected.length) {
+    lines.push(`1- ( ${formatMemoDinars(totals.deduction)} دينار ) بسبب الشذوذات في الفحوصات المخبريــــــــــــــــــــة .`);
+  }
+  if (rejected.length > 0) {
+    const idx = lines.length + 1;
+    const names = rejected.map((it) => `${it.itemName}${it.location ? " - " + it.location : ""}`).join(" ، ");
+    lines.push(`${idx}- رفض الفحوصات المخبرية التالية لتجاوز الحدود المسموحة في الأسس: ( ${names} ) .`);
+  }
+  return lines.join("\n");
+}
 
 function closeCorrespondenceModal() {
   const modal = document.getElementById("correspondenceModal");
@@ -9870,44 +10039,54 @@ function closeCorrespondencePreview() {
 }
 
 function openCorrespondenceModal(kind, projectId, reportId) {
-  const def = CORRESPONDENCE_DEFS[kind];
-  if (!def) return;
+  const resolvedKind = "memo";
+  const def = CORRESPONDENCE_DEFS[resolvedKind];
   const p = getProjectById(projectId);
   if (!p) return;
   const r = p.reports.find((x) => x.id === reportId);
   if (!r) return;
   const items = getReportView(p, r).items;
   if (!items.length) {
-    alert("لا توجد فحوصات في هذا التقرير لإصدار المراسلة.");
+    alert("لا توجد فحوصات في هذا التقرير لإصدار المذكرة الداخلية.");
     return;
   }
   const rejected = items.filter((it) => it.anyRejected);
-  if (!rejected.length && kind === "contractor") {
-    alert("لا توجد فحوصات مرفوضة في هذا التقرير. يمكنك تحديد الفحوصات المطلوبة يدوياً من القائمة.");
-  }
+  const defaultSelectedIds = items.map((it) => it.id);
+  const defaultSubject = buildDefaultMemoSubject(p);
+  const defaultPoints = buildDefaultMemoPoints(items);
 
   correspondenceState = {
-    kind,
+    kind: resolvedKind,
     projectId,
     reportId,
     items,
-    selectedIds: rejected.map((it) => it.id),
+    selectedIds: defaultSelectedIds,
     docNo: `${p.projectNo}/${def.docLabel}/${String(r.serialNumber).padStart(3, "0")}`,
     date: formatDate(r.date),
-    note: "",
+    fromText: "رئيس قسم المختبر / م.براءة الغليلات",
+    toText: "مدير أشغال محافظة مادبا",
+    subject: defaultSubject,
+    note: defaultPoints,
+    lastAutoPoints: defaultPoints,
     html: ""
   };
 
   document.getElementById("correspondenceProjectId").value = p.id;
   document.getElementById("correspondenceReportId").value = r.id;
-  document.getElementById("correspondenceKind").value = kind;
+  document.getElementById("correspondenceKind").value = resolvedKind;
   document.getElementById("correspondenceDocNo").value = correspondenceState.docNo;
   document.getElementById("correspondenceDate").value = correspondenceState.date;
-  document.getElementById("correspondenceNote").value = "";
+  const fromEl = document.getElementById("correspondenceFrom");
+  const toEl = document.getElementById("correspondenceTo");
+  const subjEl = document.getElementById("correspondenceSubject");
+  if (fromEl) fromEl.value = correspondenceState.fromText;
+  if (toEl) toEl.value = correspondenceState.toText;
+  if (subjEl) subjEl.value = correspondenceState.subject;
+  document.getElementById("correspondenceNote").value = defaultPoints;
   document.getElementById("correspondenceModalTitle").textContent = `${def.label} — ${r.reportNo}`;
   document.getElementById("correspondenceIntro").innerHTML =
     `<strong>التقرير المرجعي:</strong> <span dir="ltr">${escHTML(r.reportNo)}</span> — ${escHTML(p.name)} | ` +
-    `الفحوصات المرفوضة في التقرير: <strong>${rejected.length}</strong> من ${items.length}`;
+    `إجمالي الفحوصات: <strong>${items.length}</strong> (منها مرفوضة: <strong>${rejected.length}</strong>)`;
 
   renderCorrespondenceItems();
   closeCorrespondencePreview();
@@ -9943,6 +10122,17 @@ function getSelectedCorrespondenceIds() {
     .map((box) => box.dataset.itemId);
 }
 
+function syncAutoMemoPointsIfUnedited(selectedItems) {
+  const st = correspondenceState;
+  const noteEl = document.getElementById("correspondenceNote");
+  if (!st || !noteEl) return;
+  const nextPoints = buildDefaultMemoPoints(selectedItems);
+  if (!noteEl.value.trim() || noteEl.value.trim() === (st.lastAutoPoints || "").trim()) {
+    noteEl.value = nextPoints;
+  }
+  st.lastAutoPoints = nextPoints;
+}
+
 function onCorrespondenceItemChange() {
   if (!correspondenceState) return;
   correspondenceState.selectedIds = getSelectedCorrespondenceIds();
@@ -9966,8 +10156,10 @@ function updateCorrespondenceCount() {
   const label = document.getElementById("correspondenceCount");
   if (!st || !label) return;
   const ids = getSelectedCorrespondenceIds();
-  const totals = computeTotals(st.items.filter((it) => ids.includes(it.id)));
-  label.textContent = `المحدد: ${ids.length} من ${st.items.length} فحص — الحسم: ${formatMoney(totals.deduction)} د.أ`;
+  const selectedItems = st.items.filter((it) => ids.includes(it.id));
+  const totals = computeTotals(selectedItems);
+  label.textContent = `المحدد: ${ids.length} من ${st.items.length} فحص — الحسم: ${formatMemoDinars(totals.deduction)} دينار (${formatMoney(totals.deduction)} د.أ)`;
+  syncAutoMemoPointsIfUnedited(selectedItems);
 }
 
 function normalizeCorrespondenceDate(input) {
@@ -9986,119 +10178,153 @@ function collectCorrespondenceContext() {
 
   const docNoEl = document.getElementById("correspondenceDocNo");
   const dateEl = document.getElementById("correspondenceDate");
+  const fromEl = document.getElementById("correspondenceFrom");
+  const toEl = document.getElementById("correspondenceTo");
+  const subjEl = document.getElementById("correspondenceSubject");
   const noteEl = document.getElementById("correspondenceNote");
-  st.docNo = docNoEl ? docNoEl.value.trim() : st.docNo;
-  if (!st.docNo) {
-    alert("يرجى إدخال رقم المراسلة قبل الإصدار.");
-    if (docNoEl) docNoEl.focus();
-    return null;
-  }
+  st.docNo = (docNoEl && docNoEl.value.trim()) ? docNoEl.value.trim() : st.docNo;
   const date = validEditedDate(dateEl, st.date);
   if (!date) return null;
   st.date = date;
-  st.note = noteEl ? noteEl.value.trim() : "";
+  st.fromText = (fromEl && fromEl.value.trim()) ? fromEl.value.trim() : "رئيس قسم المختبر / م.براءة الغليلات";
+  st.toText = (toEl && toEl.value.trim()) ? toEl.value.trim() : "مدير أشغال محافظة مادبا";
+  st.subject = (subjEl && subjEl.value.trim()) ? subjEl.value.trim() : buildDefaultMemoSubject(p);
   st.selectedIds = getSelectedCorrespondenceIds();
   if (!st.selectedIds.length) {
-    alert("يرجى تحديد فحص واحد على الأقل لإدراجه في المراسلة.");
+    alert("يرجى تحديد فحص واحد على الأقل لإدراجه في المذكرة الداخلية.");
     return null;
   }
   st.selectedItems = st.items.filter((it) => st.selectedIds.includes(it.id));
+  st.note = (noteEl && noteEl.value.trim()) ? noteEl.value.trim() : buildDefaultMemoPoints(st.selectedItems);
   return { project: p, report: r, state: st };
 }
 
 function buildCorrespondenceHTML(p, r, st) {
-  const def = CORRESPONDENCE_DEFS[st.kind];
   const items = st.selectedItems || [];
-  const totals = computeTotals(items);
-  const rejectedCount = items.filter((it) => it.anyRejected).length;
-  const introText = st.kind === "contractor"
-    ? `بناءً على التقرير رقم ${r.reportNo} المؤرخ ${formatDate(r.date)} الخاص بالمشروع ${p.name} (رقم المشروع ${p.projectNo})، تبين من الفحوصات المخبرية أن العينات الموضحة أدناه غير مطابقة للأسس المعتمدة (الإصدار 2023 م). نرجو التكرم بتصويبها وإعادة الفحص، واتخاذ الإجراءات اللازمة لتفادي تكرارها.`
-    : `إشارة إلى التقرير رقم ${r.reportNo} المؤرخ ${formatDate(r.date)}، نحيطكم علماً بأن (${rejectedCount}) من الفحوصات المخبرية للمشروع ${p.name} (رقم المشروع ${p.projectNo}) رُفضت وفق أسس القبول المعتمدة (الإصدار 2023 م)، وتبلغ قيمة الحسميات المرتبطة بالفحوصات المحددة ${formatMoney(totals.deduction)} د.أ. ونوصي بإحالة الموضوع إلى المقاول لتصويبها وإعادة الفحص قبل اعتماد الاستلام النهائي.`;
-
-  const toBlock = st.kind === "contractor"
-    ? `<div><strong>إلى:</strong> ${escHTML(p.contractor || "المقاول المعني")}</div>
-       <div><strong>المشروع:</strong> ${escHTML(p.name)} — <span dir="ltr">${escHTML(p.projectNo)}</span></div>
-       <div><strong>الموضوع:</strong> ${escHTML(def.subject)}</div>`
-    : `<div><strong>إلى:</strong> سعادة مدير أشغال محافظة مأدبا المحترم</div>
-       <div><strong>من:</strong> رئيس قسم مختبر مديرية أشغال محافظة مأدبا</div>
-       <div><strong>المشروع:</strong> ${escHTML(p.name)} — <span dir="ltr">${escHTML(p.projectNo)}</span></div>
-       <div><strong>الموضوع:</strong> ${escHTML(def.subject)}</div>`;
-
-  const sigBlocks = st.kind === "contractor"
-    ? [
-        ["أعدّ الكتاب", "مهندس المختبر / مختبر الطرق", "الاسم: ................................."],
-        ["تدقيق ومراجعة", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا", "الاسم: م.براءة الغليلات"]
-      ]
-    : [["تدقيق ومراجعة", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا", "الاسم: م.براءة الغليلات"]];
-
-  const signaturesHTML = `
-    <div class="rp-signatures${st.kind === "memo" ? " rp-signatures-single" : ""}"${sigBlocks.length > 1 ? ` style="grid-template-columns:repeat(${sigBlocks.length}, 1fr);"` : ""}>
-      ${sigBlocks.map((b) => `
-        <div>
-          <div>${b[0]}</div>
-          <div class="rp-sig-line"><strong>${b[1]}</strong><div>${b[2]}</div></div>
-        </div>`).join("")}
-    </div>`;
+  const rawPoints = (st.note && st.note.trim()) ? st.note.trim() : buildDefaultMemoPoints(items);
+  const pointLines = rawPoints.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const fromText = st.fromText || "رئيس قسم المختبر / م.براءة الغليلات";
+  const toText = st.toText || "مدير أشغال محافظة مادبا";
+  const subjectText = st.subject || buildDefaultMemoSubject(p);
 
   return `
-  <div class="report-paper">
-    <div class="rp-official-header">
-      <div class="rp-emblem">${getReportEmblemHTML()}</div>
-      <div class="rp-header-center">
-        <div class="rp-kingdom">المملكة الأردنية الهاشمية</div>
-        <div class="rp-ministry">وزارة الأشغال العامة والإسكان</div>
-        <div class="rp-directorate">مديرية أشغال محافظة مأدبا</div>
-        <div class="rp-kingdom">المختبر المركزي-الحسميات والشذوذات</div>
-      </div>
-      <div class="rp-ref-box">
-        <div>${def.docLabel} رقم: <span dir="ltr">${escHTML(st.docNo)}</span></div>
-        <div>التاريخ: <input type="text" class="rp-date-input" dir="ltr" value="${escHTML(formatDate(st.date))}" onchange="updateCorrespondencePreviewDate(this)" title="بصيغة يوم/شهر/سنة — مثال: 1/9/2026" /></div>
-        <div>رقم التقرير: <span dir="ltr">${escHTML(r.reportNo)}</span></div>
-        <div>رقم المشروع: <span dir="ltr">${escHTML(p.projectNo)}</span></div>
+  <div class="report-paper memo-official-paper">
+    <div class="memo-top-header">
+      <div class="memo-emblem rp-emblem">${getReportEmblemHTML()}</div>
+      <div class="memo-title-block">
+        <div class="memo-ministry">وزارة الأشغال العامة والإسكان</div>
+        <div class="memo-doc-title">مذكرة داخلية</div>
       </div>
     </div>
 
-    <div class="rp-title">${escHTML(def.title)}</div>
-    <div class="rp-subtitle">${escHTML(def.subtitle)}</div>
-
-    <div class="rp-letter-to">${toBlock}</div>
-    <div class="rp-letter-text">${escHTML(introText)}</div>
-
-    <div class="rp-section-title">الفحوصات المحددة</div>
-    <table class="rp-table">
-      <thead><tr><th>#</th><th>الموقع / العينة</th><th>الجدول</th><th>الفحص المخبري</th><th>القرار</th><th>الحسم (د.أ)</th><th>الإجراء المطلوب</th></tr></thead>
+    <table class="memo-routing-table">
+      <thead>
+        <tr>
+          <th style="width:38%;"></th>
+          <th style="width:32%;"></th>
+          <th style="width:15%;">التوقيع</th>
+          <th style="width:15%;">التاريخ</th>
+        </tr>
+      </thead>
       <tbody>
-        ${items.map((it, idx) => `
-          <tr>
-            <td>${idx + 1}</td>
-            <td>${escHTML(it.location)}</td>
-            <td>${escHTML(tableRefText(it))}</td>
-            <td>${escHTML(it.itemName)}</td>
-            <td>${it.anyRejected ? "مرفوض" : escHTML(it.finalDecision || "---")}</td>
-            <td><span class="rp-num">${formatMoney(it.totalDeduction)}</span></td>
-            <td class="rp-letter-action">${it.anyRejected ? "تصويب الفحص وإعادة أخذ عينة" : "مراجعة النتيجة ومتابعتها"}</td>
-          </tr>`).join("")}
-        <tr style="background:#f1f5f9;font-weight:800;">
-          <td colspan="5">الإجمالي (${items.length} فحص)</td>
-          <td><span class="rp-num">${formatMoney(totals.deduction)}</span></td>
-          <td>---</td>
+        <tr>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">من</span>
+              <span class="memo-line-fill align-right">${escHTML(fromText)}</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">&nbsp;</span>
+              <span class="memo-line-fill">${escHTML(toText)}</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">
+                <input type="text" class="rp-date-input memo-date-input" dir="ltr" value="${escHTML(formatDate(st.date))}" onchange="updateCorrespondencePreviewDate(this)" title="بصيغة يوم/شهر/سنة — مثال: 23/11/2026" />
+              </span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">من</span>
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">إلى</span>
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">من</span>
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-tag">إلى</span>
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
+          <td>
+            <div class="memo-cell-inner">
+              <span class="memo-line-fill">&nbsp;</span>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <div class="rp-letter-summary">
-      <span>عدد الفحوصات المحددة: ${items.length}</span>
-      <span>منها مرفوضة: ${rejectedCount}</span>
-      <span>قيمة الحسم: <span class="rp-num">${formatMoney(totals.deduction)}</span> د.أ</span>
+    <div class="memo-subject-wrap">
+      <span>الموضوع :- </span><span class="memo-subject-text">${escHTML(subjectText)}</span>
     </div>
 
-    <div class="rp-note-official"><strong>ملاحظة:</strong> الكميات كما وردتنا من قسم المساحة والدراسات</div>
-    ${st.note ? `<div class="rp-letter-extra">${escHTML(st.note)}</div>` : ""}
+    <div class="memo-body-intro">
+      إشارة إلى موضوع البحث أعلاه ، بخصوص الحسميات على الشذوذات في الفحوصات المخبرية التابعه للعطاء مدار البحث. واستنادا إلى أسس القبول والقبول مع الحسم والرفض لمشاريع الطرق عام 2024.
+    </div>
 
-    ${signaturesHTML}
+    <div class="memo-body-notice">
+      * أرجو العلم أن قيمة الحسم كما هو موضح بالمرفق كــــــــــــــــــــما يلي :
+    </div>
 
-    <div class="rp-footer">
-      مديرية أشغال محافظة مأدبا — المختبر المركزي-الحسميات والشذوذات — وزارة الأشغال العامة والإسكان | ${def.docLabel} رقم: ${escHTML(st.docNo)} | صفحة 1 من 1
+    <div class="memo-points-block">
+      ${pointLines.map((line) => `<div class="memo-point-line">${escHTML(line)}</div>`).join("")}
+    </div>
+
+    <div class="memo-closing">وتفضلوا الاحترام ،،،</div>
+
+    <div class="memo-cc-block">
+      <div>نسخه/ نسخه/ رئيس قسم المــــــــــــــــــــختبر</div>
+      <div>نسخه / للــــــــــــــــــــــــــــــــــــــــملف</div>
     </div>
   </div>`;
 }
@@ -10108,7 +10334,7 @@ function previewCorrespondence() {
   if (!ctx) return;
   correspondenceState.html = buildCorrespondenceHTML(ctx.project, ctx.report, ctx.state);
   document.getElementById("correspondencePreviewTitle").textContent =
-    `${CORRESPONDENCE_DEFS[ctx.state.kind].label} — ${ctx.state.docNo}`;
+    `${CORRESPONDENCE_DEFS.memo.label} — ${ctx.state.docNo}`;
   document.getElementById("correspondencePreviewContent").innerHTML = correspondenceState.html;
   closeCorrespondenceModal();
   document.getElementById("correspondencePreviewModal").classList.remove("hidden");
@@ -10174,7 +10400,6 @@ function renderProjectReports(p) {
             <button type="button" class="btn btn-excel btn-sm" onclick="exportReportExcel('${p.id}','${r.id}')">📗 Excel</button>
             <button type="button" class="btn btn-word btn-sm" onclick="exportReportWord('${p.id}','${r.id}')">📘 Word</button>
             <button type="button" class="btn btn-edit btn-sm" onclick="openReportRowsModal('${p.id}','${r.id}')" title="تحديد الصفوف الظاهرة في التقرير">✂️ تحديد الصفوف</button>
-            <button type="button" class="btn btn-edit btn-sm" onclick="openCorrespondenceModal('contractor','${p.id}','${r.id}')" title="كتاب للمقاول بالفحوصات المرفوضة">✉️ كتاب مقاول</button>
             <button type="button" class="btn btn-outline-dark btn-sm" onclick="openCorrespondenceModal('memo','${p.id}','${r.id}')" title="مذكرة داخلية لمدير الأشغال">📝 مذكرة داخلية</button>
             <button type="button" class="btn btn-danger-outline btn-sm" onclick="deleteProjectReport('${p.id}','${r.id}')" title="حذف التقرير">🗑️</button>
           </div>

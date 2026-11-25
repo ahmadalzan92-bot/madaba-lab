@@ -3513,7 +3513,6 @@ input[inputmode="decimal"] {
       <div id="reportSignatureOptions" class="sig-options-bar"></div>
       <div class="report-modal-buttons">
         <button type="button" class="btn btn-edit btn-sm" onclick="openReportRowsModal(currentPrintProjectId, currentPrintReportId)" title="تحديد الصفوف الظاهرة في التقرير">✂️ تحديد الصفوف</button>
-        <button type="button" class="btn btn-edit btn-sm" onclick="openCorrespondenceModal('contractor', currentPrintProjectId, currentPrintReportId)" title="كتاب للمقاول بالفحوصات المرفوضة">✉️ كتاب مقاول</button>
         <button type="button" class="btn btn-outline-dark btn-sm" onclick="openCorrespondenceModal('memo', currentPrintProjectId, currentPrintReportId)" title="مذكرة داخلية لمدير الأشغال">📝 مذكرة داخلية</button>
         <button type="button" class="btn btn-primary btn-sm" onclick="printReportFromModal()">🖨️ طباعة التقرير</button>
         <button type="button" class="btn btn-excel btn-sm" onclick="exportCurrentReportExcel()">📗 Excel</button>
@@ -3550,41 +3549,48 @@ input[inputmode="decimal"] {
     </div>
   </div>
 
-  <!-- نافذة إصدار كتاب للمقاول أو مذكرة داخلية لمدير الأشغال -->
+  <!-- نافذة إصدار مذكرة داخلية لمدير الأشغال -->
   <div id="correspondenceModal" class="edit-modal hidden no-print" role="dialog" aria-modal="true" aria-labelledby="correspondenceModalTitle">
     <div class="edit-modal-card correspondence-modal-card">
       <div class="edit-modal-header">
-        <strong id="correspondenceModalTitle">إصدار مراسلة</strong>
+        <strong id="correspondenceModalTitle">إصدار مذكرة داخلية</strong>
         <button type="button" class="edit-modal-close" onclick="closeCorrespondenceModal()" aria-label="إغلاق">✖</button>
       </div>
       <div class="edit-modal-body">
         <input type="hidden" id="correspondenceProjectId" />
         <input type="hidden" id="correspondenceReportId" />
         <input type="hidden" id="correspondenceKind" />
-        <div class="correspondence-fields">
-          <label>رقم المراسلة:
-            <input type="text" id="correspondenceDocNo" class="form-control" dir="ltr" lang="en" />
+        <input type="hidden" id="correspondenceDocNo" />
+        <div class="correspondence-fields correspondence-fields-3">
+          <label>من:
+            <input type="text" id="correspondenceFrom" class="form-control" value="رئيس قسم المختبر / م.براءة الغليلات" />
+          </label>
+          <label>إلى:
+            <input type="text" id="correspondenceTo" class="form-control" value="مدير أشغال محافظة مادبا" />
           </label>
           <label>التاريخ (يوم/شهر/سنة):
-            <input type="text" id="correspondenceDate" class="form-control rp-date-input" dir="ltr" lang="en" onchange="normalizeCorrespondenceDate(this)" title="بصيغة يوم/شهر/سنة — مثال: 1/9/2026" />
+            <input type="text" id="correspondenceDate" class="form-control rp-date-input" dir="ltr" lang="en" onchange="normalizeCorrespondenceDate(this)" title="بصيغة يوم/شهر/سنة — مثال: 23/11/2026" />
           </label>
         </div>
+        <label class="correspondence-note-field" style="margin-top:0;margin-bottom:10px;">الموضوع :-
+          <textarea id="correspondenceSubject" class="form-control" rows="2"></textarea>
+        </label>
         <div id="correspondenceIntro" class="correspondence-intro"></div>
         <div class="correspondence-quick">
-          <span class="rr-rows-label">الفحوصات:</span>
+          <span class="rr-rows-label">الفحوصات المحتسبة في المذكرة:</span>
           <button type="button" class="btn btn-secondary btn-sm" onclick="toggleAllCorrespondenceItems(true)">تحديد الكل</button>
           <button type="button" class="btn btn-edit btn-sm" onclick="selectRejectedCorrespondenceItems()">المرفوضة فقط</button>
           <button type="button" class="btn btn-outline-dark btn-sm" onclick="toggleAllCorrespondenceItems(false)">إلغاء التحديد</button>
           <span id="correspondenceCount" class="correspondence-count">المحدد: 0</span>
         </div>
         <div id="correspondenceItemsList" class="report-rows-list"></div>
-        <label class="correspondence-note-field">ملاحظة إضافية تُدرج في المراسلة (اختياري):
-          <textarea id="correspondenceNote" class="form-control" rows="2" placeholder="مثال: يرجى التصويب وإعادة الفحص خلال أسبوع عمل واحد."></textarea>
+        <label class="correspondence-note-field">بنود قيمة الحسم في المذكرة (تُحدَّث تلقائياً حسب الفحوصات المحددة ويمكنك تعديلها):
+          <textarea id="correspondenceNote" class="form-control" rows="2"></textarea>
         </label>
       </div>
       <div class="edit-modal-footer">
         <button type="button" class="btn btn-secondary btn-sm" onclick="closeCorrespondenceModal()">إلغاء</button>
-        <button type="button" class="btn btn-primary btn-sm" onclick="previewCorrespondence()">👁️ معاينة المراسلة</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="previewCorrespondence()">👁️ معاينة المذكرة الداخلية</button>
       </div>
     </div>
   </div>

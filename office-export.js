@@ -521,6 +521,17 @@ function buildDocxStyles() {
   const center = '<w:jc w:val="center"/>';
   const sectionBorder = '<w:pBdr><w:right w:val="single" w:sz="24" w:space="4" w:color="C59B27"/></w:pBdr>';
   const styles = [
+    `<w:style w:type="paragraph" w:default="1" w:styleId="Normal">${wStyle("Normal", "Normal", { size: 11, color: "111111" })}`,
+    wStyle("MemoMinistry", "Memo Ministry", { size: 16, bold: true, color: "111111", pPr: '<w:jc w:val="center"/><w:spacing w:after="60"/>' }),
+    wStyle("MemoDocTitle", "Memo Doc Title", { size: 15, bold: true, color: "111111", pPr: '<w:jc w:val="center"/><w:spacing w:before="600" w:after="600"/>' }),
+    wStyle("MemoCellRight", "Memo Cell Right", { size: 11, bold: true, color: "111111", pPr: '<w:jc w:val="right"/>' }),
+    wStyle("MemoCellCenter", "Memo Cell Center", { size: 11, bold: true, color: "111111", pPr: '<w:jc w:val="center"/>' }),
+    wStyle("MemoSubject", "Memo Subject", { size: 13, bold: true, color: "111111", pPr: '<w:ind w:left="500" w:right="180"/><w:spacing w:before="400" w:after="300" w:line="360" w:lineRule="auto"/><w:rPr><w:u w:val="single"/></w:rPr>' }),
+    wStyle("MemoBody", "Memo Body", { size: 12.5, bold: true, color: "111111", pPr: '<w:ind w:left="500"/><w:spacing w:before="200" w:after="160" w:line="360" w:lineRule="auto"/><w:jc w:val="both"/>' }),
+    wStyle("MemoNotice", "Memo Notice", { size: 12.5, bold: true, color: "111111", pPr: '<w:ind w:left="380"/><w:spacing w:before="180" w:after="200" w:line="360" w:lineRule="auto"/>' }),
+    wStyle("MemoPoint", "Memo Point", { size: 12.5, bold: true, color: "111111", pPr: '<w:spacing w:before="140" w:after="160" w:line="340" w:lineRule="auto"/>' }),
+    wStyle("MemoClosing", "Memo Closing", { size: 13, bold: true, color: "111111", pPr: '<w:jc w:val="center"/><w:spacing w:before="700" w:after="950"/>' }),
+    wStyle("MemoCC", "Memo CC", { size: 11, bold: true, color: "111111", pPr: '<w:jc w:val="right"/><w:spacing w:after="80"/>' }),
     `<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:pPr><w:bidi/><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr>${wRunProps(8, false, "111111")}</w:rPr></w:style>`,
     wStyle("RPKingdom", "RP Kingdom", { size: 9, bold: true, pPr: center }),
     wStyle("RPMinistry", "RP Ministry", { size: 12, bold: true, color: "2B4922", pPr: center }),
@@ -540,9 +551,135 @@ function buildDocxStyles() {
     wStyle("RPSigLabel", "RP Signature Label", { size: 8, pPr: center }),
     wStyle("RPSigName", "RP Signature Name", { size: 8, bold: true, color: "1E3518", pPr: center }),
     wStyle("RPSigSub", "RP Signature Sub", { size: 8, pPr: center }),
-    wStyle("RPFooter", "RP Footer", { size: 7, color: "475569", pPr: center })
+    wStyle("RPFooter", "RP Footer", { size: 7, color: "475569", pPr: center }),
+    wStyle("MemoMinistry", "Memo Ministry", { size: 15, bold: true, color: "111111", pPr: center }),
+    wStyle("MemoDocTitle", "Memo Doc Title", { size: 15, bold: true, color: "111111", pPr: center }),
+    wStyle("MemoCellRight", "Memo Cell Right", { size: 11, bold: true, color: "111111" }),
+    wStyle("MemoCellCenter", "Memo Cell Center", { size: 11, bold: true, color: "111111", pPr: center }),
+    wStyle("MemoSubject", "Memo Subject", { size: 13, bold: true, color: "111111", pPr: '<w:ind w:right="720" w:left="420"/><w:spacing w:before="440" w:after="360" w:line="360" w:lineRule="auto"/>', rPr: '<w:u w:val="single"/>' }),
+    wStyle("MemoBody", "Memo Body", { size: 12.5, bold: true, color: "111111", pPr: '<w:jc w:val="both"/><w:spacing w:before="240" w:after="200" w:line="380" w:lineRule="auto"/>' }),
+    wStyle("MemoNotice", "Memo Notice", { size: 12.5, bold: true, color: "111111", pPr: '<w:ind w:right="360"/><w:spacing w:before="180" w:after="200" w:line="380" w:lineRule="auto"/>' }),
+    wStyle("MemoPoint", "Memo Point", { size: 12.5, bold: true, color: "111111", pPr: '<w:spacing w:before="140" w:after="160" w:line="380" w:lineRule="auto"/>' }),
+    wStyle("MemoClosing", "Memo Closing", { size: 13, bold: true, color: "111111", pPr: center + '<w:spacing w:before="720" w:after="960"/>' }),
+    wStyle("MemoCC", "Memo CC", { size: 10.5, bold: true, color: "111111", pPr: '<w:spacing w:before="80" w:after="80" w:line="320" w:lineRule="auto"/>' })
   ];
   return `${xmlHeader()}<w:styles xmlns:w="${OOXML_XMLNS.word}">${styles.join("")}</w:styles>`;
+}
+
+function wPUnicodeDotG(opts = {}) {
+  return `<w:p>${opts.pPr || ""}<w:r><w:t xml:space="preserve">· ع </w:t></w:r></w:p>`;
+}
+
+function buildMemoDocxHeader(logo) {
+  return `${xmlHeader()}
+<w:hdr xmlns:w="${OOXML_XMLNS.word}" xmlns:r="${OOXML_XMLNS.officeRel}" xmlns:wp="${OOXML_XMLNS.wp}" xmlns:a="${OOXML_XMLNS.drawing}" xmlns:pic="${OOXML_XMLNS.pic}">
+  ${wTbl([wTr([
+    wTc(logo ? [wLogoDrawing(logo, "rId1")] : [wP("🏛️", "MemoMinistry")], 2000, "MemoMinistry"),
+    wTc([wP("وزارة الأشغال العامة والإسكان", "MemoMinistry"), wP("مذكرة داخلية", "MemoDocTitle")], 4000, "MemoMinistry")
+  ])], [2000, 4000])}
+</w:hdr>`;
+}
+
+function buildMemoDocxFooter() {
+  return `${xmlHeader()}<w:ftr xmlns:w="${OOXML_XMLNS.word}"><w:p><w:pPr><w:jc w:val="right"/></w:pPr></w:p></w:ftr>`;
+}
+
+function buildMemoDocx(p, report, meta, items, points) {
+  const docNo = (meta && meta.docNo) || `${p.projectNo}/مذكرة/${String(report.serialNumber).padStart(3, "0")}`;
+  const memoDate = typeof ltrDate === "function" ? ltrDate((meta && meta.date) || report.date) : formatDate((meta && meta.date) || report.date);
+  const fromText = (meta && meta.fromText) || "رئيس قسم المختبر / م.براءة الغليلات";
+  const toText = (meta && meta.toText) || "مدير أشغال محافظة مادبا";
+  const subjectText = (meta && meta.subject) || (typeof buildDefaultMemoSubject === "function" ? buildDefaultMemoSubject(p) : `عطاء رقم ${p.projectNo} الخاص بـ ${p.name}`);
+  const logo = getReportLogoImage();
+  const thin = { top: { sz: 6 }, left: {}, bottom: {}, right: {} };
+  const body = [];
+  const colWidths = [3800, 3000, 1600, 1600];
+
+  body.push(wTbl([
+    wTr([wTc("", colWidths[0], "MemoCellRight", { shade: "F8FAFC", borders: thin }), wTc("", colWidths[1], "MemoCellCenter", { shade: "F8FAFC", borders: thin }), wTc("التوقيع", colWidths[2], "MemoCellCenter", { shade: "F8FAFC", borders: thin }), wTc("التاريخ", colWidths[3], "MemoCellCenter", { shade: "F8FAFC", borders: thin })]),
+    wTr([
+      wTc(`من   ${fromText}`, colWidths[0], "MemoCellRight", { shade: "F2E8CF", borders: thin }),
+      wTc(toText, colWidths[1], "MemoCellCenter", { shade: "F2E8CF", borders: thin }),
+      wTc(" ", colWidths[2], "MemoCellCenter", { shade: "F2E8CF", borders: thin }),
+      wTc(memoDate, colWidths[3], "MemoCellCenter", { shade: "F2E8CF", borders: thin })
+    ]),
+    wTr([
+      wTc("من", colWidths[0], "MemoCellRight", { borders: thin }),
+      wTc("إلى", colWidths[1], "MemoCellRight", { borders: thin }),
+      wTc(" ", colWidths[2], "MemoCellCenter", { borders: thin }),
+      wTc(" ", colWidths[3], "MemoCellCenter", { borders: thin })
+    ]),
+    wTr([
+      wTc("من", colWidths[0], "MemoCellRight", { borders: thin }),
+      wTc("إلى", colWidths[1], "MemoCellRight", { borders: thin }),
+      wTc(" ", colWidths[2], "MemoCellCenter", { borders: thin }),
+      wTc(" ", colWidths[3], "MemoCellCenter", { borders: thin })
+    ])
+  ], colWidths));
+
+  body.push(wP(`الموضوع :- ${subjectText}`, "MemoSubject"));
+  body.push(wPUnicodeDotG());
+  body.push(wP("إشارة إلى موضوع البحث أعلاه ، بخصوص الحسميات على الشذوذات في الفحوصات المخبرية التابعه للعطاء مدار البحث. واستنادا إلى أسس القبول والقبول مع الحسم والرفض لمشاريع الطرق عام 2024.", "MemoBody"));
+  body.push(wP("* أرجو العلم أن قيمة الحسم كما هو موضح بالمرفق كــــــــــــــــــــما يلي :", "MemoNotice"));
+  (points || []).forEach((line) => body.push(wP(line, "MemoPoint")));
+  body.push(wPUnicodeDotG());
+  body.push(wP("وتفضلوا الاحترام ،،،", "MemoClosing"));
+  body.push(wP("نسخه/ نسخه/ رئيس قسم المــــــــــــــــــــختبر", "MemoCC"));
+  body.push(wP("نسخه / للــــــــــــــــــــــــــــــــــــــــملف", "MemoCC"));
+
+  const document = `${xmlHeader()}
+<w:document xmlns:w="${OOXML_XMLNS.word}" xmlns:r="${OOXML_XMLNS.officeRel}" xmlns:wp="${OOXML_XMLNS.wp}" xmlns:a="${OOXML_XMLNS.drawing}" xmlns:pic="${OOXML_XMLNS.pic}">
+  <w:body>
+    ${body.join("")}
+    <w:sectPr>
+      <w:headerReference w:type="default" r:id="rId1"/>
+      <w:footerReference w:type="default" r:id="rId2"/>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="720" w:right="900" w:bottom="720" w:left="900" w:header="360" w:footer="360" w:gutter="0"/>
+      <w:bidi/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+  const parts = [
+    { name: "[Content_Types].xml", data: `${xmlHeader()}
+<Types xmlns="${OOXML_XMLNS.ct}">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
+  <Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>` },
+    { name: "_rels/.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/officeDocument" Target="word/document.xml"/>
+  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/extended-properties" Target="docProps/app.xml"/>
+</Relationships>` },
+    { name: "word/document.xml", data: document },
+    { name: "word/styles.xml", data: buildDocxStyles() },
+    { name: "word/header1.xml", data: buildMemoDocxHeader(logo) },
+    { name: "word/footer1.xml", data: buildMemoDocxFooter() },
+    { name: "word/_rels/document.xml.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/header" Target="header1.xml"/>
+  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/footer" Target="footer1.xml"/>
+  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/styles" Target="styles.xml"/>
+</Relationships>` },
+    { name: "word/_rels/header1.xml.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/image" Target="media/logo.png"/>
+</Relationships>` },
+    { name: "docProps/core.xml", data: officeCoreProps(docNo) },
+    { name: "docProps/app.xml", data: officeAppProps("Microsoft Office Word") }
+  ];
+  if (logo) parts.push({ name: "word/media/logo.png", data: logo.bytes });
+
+  return ooxmlZip(parts);
 }
 
 function wP(text, style, opts) {
@@ -779,157 +916,9 @@ function buildDocx(p, report, view) {
 
 /* ==================== كتاب المقاول / المذكرة الداخلية (docx حقيقي) ==================== */
 function buildCorrespondenceDocx(kind, p, report, items, meta) {
-  const isContractor = kind === "contractor";
-  const def = (typeof CORRESPONDENCE_DEFS !== "undefined" && CORRESPONDENCE_DEFS[kind])
-    ? CORRESPONDENCE_DEFS[kind]
-    : {
-        docLabel: isContractor ? "كتاب" : "مذكرة",
-        title: isContractor ? "كتاب إلى المقاول بشأن الفحوصات المرفوضة" : "مذكرة داخلية إلى مدير أشغال محافظة مأدبا",
-        subject: ""
-      };
-  const docLabel = `${def.docLabel} رقم:`;
-  const docNo = meta.docNo || `${p.projectNo}/${def.docLabel}/${String(report.serialNumber).padStart(3, "0")}`;
-  const ref = { reportNo: docNo, serialNumber: report.serialNumber, date: meta.date || report.date };
-  const logo = getReportLogoImage();
-  const t = computeTotals(items);
-  const rejectedCount = items.filter((it) => it.anyRejected).length;
-  const thin = { top: {}, left: {}, bottom: {}, right: {} };
-  const body = [];
-
-  body.push(wP(def.title, "RPTitle", { keepNext: true }));
-  body.push(wP(`${docLabel} ${docNo} — التاريخ: ${formatDate(ref.date)} — رقم التقرير: ${report.reportNo}`, "RPSubtitle"));
-
-  body.push(wP(isContractor ? "إلى" : "إلى / من", "RPSection", { keepNext: true }));
-  const toRows = isContractor
-    ? [
-        ["المقاول:", p.contractor || "المقاول المعني"],
-        ["المشروع:", `${p.name} — ${p.projectNo}`],
-        ["الموضوع:", def.subject]
-      ]
-    : [
-        ["إلى:", "سعادة مدير أشغال محافظة مأدبا المحترم"],
-        ["من:", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا"],
-        ["المشروع:", `${p.name} — ${p.projectNo}`],
-        ["الموضوع:", def.subject]
-      ];
-  body.push(wTbl(toRows.map((row) => wTr([
-    wTc(row[0], 1500, "RPMetaLabel", { shade: "F1F5F9", borders: thin }),
-    wTc(row[1], 9300, "RPMetaValue", { borders: thin })
-  ])), [1500, 9300]));
-
-  body.push(wP("النص", "RPSection", { keepNext: true }));
-  const intro = isContractor
-    ? `بناءً على التقرير رقم ${report.reportNo} المؤرخ ${formatDate(report.date)} الخاص بالمشروع ${p.name} (رقم المشروع ${p.projectNo})، تبين من الفحوصات المخبرية أن العينات الموضحة أدناه غير مطابقة للأسس المعتمدة (الإصدار 2023 م). نرجو التكرم بتصويبها وإعادة الفحص، واتخاذ الإجراءات اللازمة لتفادي تكرارها.`
-    : `إشارة إلى التقرير رقم ${report.reportNo} المؤرخ ${formatDate(report.date)}، نحيطكم علماً بأن (${rejectedCount}) من الفحوصات المخبرية للمشروع ${p.name} (رقم المشروع ${p.projectNo}) رُفضت وفق أسس القبول المعتمدة (الإصدار 2023 م)، وتبلغ قيمة الحسميات المرتبطة بالفحوصات المحددة ${formatMoney(t.deduction)} د.أ. ونوصي بإحالة الموضوع إلى المقاول لتصويبها وإعادة الفحص قبل اعتماد الاستلام النهائي.`;
-  body.push(wP(intro, "RPMetaValue"));
-
-  body.push(wP("الفحوصات المحددة", "RPSection", { keepNext: true }));
-  const widths = [420, 2000, 900, 1800, 1800, 900, 2980];
-  const heads = ["#", "الموقع / العينة", "الجدول", "الفحص المخبري", "القرار", "الحسم (د.أ)", "الإجراء المطلوب"];
-  const tableRows = [wTr(heads.map((h) => wTc(h, widths[heads.indexOf(h)], "RPTableHeader", { shade: "E4DAC4", borders: thin })), { header: true })];
-  items.forEach((it, idx) => {
-    const shade = idx % 2 === 1 ? "F8FAFC" : null;
-    tableRows.push(wTr([
-      wTc(String(idx + 1), widths[0], "RPTableCell", { shade, borders: thin }),
-      wTc(it.location, widths[1], "RPTableCell", { shade, borders: thin }),
-      wTc(tableRefText(it), widths[2], "RPTableCell", { shade, borders: thin }),
-      wTc(it.itemName, widths[3], "RPTableCell", { shade, borders: thin }),
-      wTc(it.anyRejected ? "مرفوض" : (it.finalDecision || "---"), widths[4], "RPTableCell", { shade, borders: thin }),
-      wTc(formatMoney(it.totalDeduction), widths[5], "RPTableNum", { shade, borders: thin }),
-      wTc(it.anyRejected ? "تصويب الفحص وإعادة أخذ عينة" : "مراجعة النتيجة ومتابعتها", widths[6], "RPTableCell", { shade, borders: thin })
-    ]));
-  });
-  tableRows.push(wTr([
-    wTc(`الإجمالي (${items.length} فحص)`, widths[0] + widths[1] + widths[2] + widths[3] + widths[4], "RPTableCell", { shade: "F1F5F9", borders: thin }),
-    wTc(formatMoney(t.deduction), widths[5], "RPTableNum", { shade: "F1F5F9", borders: thin }),
-    wTc("---", widths[6], "RPTableCell", { shade: "F1F5F9", borders: thin })
-  ]));
-  body.push(wTbl(tableRows, widths));
-
-  body.push(wP("", "RPSumValue", { pPr: '<w:spacing w:before="60"/>' }));
-  body.push(wTbl([
-    wTr([
-      wTc("عدد الفحوصات المحددة", 3600, "RPSumLabel", { borders: thin }),
-      wTc("منها مرفوضة", 3600, "RPSumLabel", { borders: thin }),
-      wTc("قيمة الحسم (د.أ)", 3600, "RPSumLabel", { shade: "FEF3C7", borders: thin })
-    ]),
-    wTr([
-      wTc(String(items.length), 3600, "RPSumValue", { borders: thin }),
-      wTc(String(rejectedCount), 3600, "RPSumValue", { borders: thin }),
-      wTc(formatMoney(t.deduction), 3600, "RPSumValue", { shade: "FEF3C7", borders: thin })
-    ])
-  ], [3600, 3600, 3600]));
-
-  body.push(wP([{ text: "ملاحظة: ", bold: true }, { text: "الكميات كما وردتنا من قسم المساحة والدراسات", bold: true }], "RPNote", {
-    pPr: '<w:pBdr><w:top w:val="single" w:sz="6" w:space="2" w:color="94A3B8"/><w:left w:val="single" w:sz="6" w:space="2" w:color="94A3B8"/><w:bottom w:val="single" w:sz="6" w:space="2" w:color="94A3B8"/><w:right w:val="single" w:sz="6" w:space="2" w:color="94A3B8"/></w:pBdr><w:shd w:val="clear" w:fill="F8FAFC"/><w:spacing w:before="140" w:after="80"/>'
-  }));
-  if (meta.note) body.push(wP(meta.note, "RPNote", { pPr: '<w:spacing w:before="80"/>' }));
-
-  const signatureBlocks = isContractor
-    ? [
-        ["أعدّ الكتاب", "مهندس المختبر / مختبر الطرق", "الاسم: ................................."],
-        ["تدقيق ومراجعة", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا", "الاسم: م.براءة الغليلات"]
-      ]
-    : [["تدقيق ومراجعة", "رئيس قسم مختبر مديرية أشغال محافظة مأدبا", "الاسم: م.براءة الغليلات"]];
-  const sigWidths = signatureBlocks.length === 2 ? [5400, 5400] : [10800];
-  body.push(wP("", "RPSigLabel", { pPr: '<w:spacing w:before="60"/>' }));
-  body.push(wTbl([wTr(signatureBlocks.map((b, i) => wTc([
-    wP(b[0], "RPSigLabel", { pPr: '<w:spacing w:before="180" />' }),
-    wP(b[1], "RPSigName", { pPr: '<w:pBdr><w:top w:val="single" w:sz="6" w:space="4" w:color="334155"/></w:pBdr><w:spacing w:before="10" w:after="40"/>' }),
-    wP(b[2], "RPSigSub")
-  ], sigWidths[i], "RPSigLabel")), { noSplit: true })], sigWidths));
-
-  const document = `${xmlHeader()}
-<w:document xmlns:w="${OOXML_XMLNS.word}" xmlns:r="${OOXML_XMLNS.officeRel}" xmlns:wp="${OOXML_XMLNS.wp}" xmlns:a="${OOXML_XMLNS.drawing}" xmlns:pic="${OOXML_XMLNS.pic}">
-  <w:body>
-    ${body.join("")}
-    <w:sectPr>
-      <w:headerReference w:type="default" r:id="rId1"/>
-      <w:footerReference w:type="default" r:id="rId2"/>
-      <w:pgSz w:w="11906" w:h="16838"/>
-      <w:pgMar w:top="454" w:right="454" w:bottom="454" w:left="454" w:header="170" w:footer="170" w:gutter="0"/>
-      <w:bidi/>
-    </w:sectPr>
-  </w:body>
-</w:document>`;
-
-  const parts = [
-    { name: "[Content_Types].xml", data: `${xmlHeader()}
-<Types xmlns="${OOXML_XMLNS.ct}">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Default Extension="png" ContentType="image/png"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-  <Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
-  <Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
-  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-</Types>` },
-    { name: "_rels/.rels", data: `${xmlHeader()}
-<Relationships xmlns="${OOXML_XMLNS.rel}">
-  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/officeDocument" Target="word/document.xml"/>
-  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/metadata/core-properties" Target="docProps/core.xml"/>
-  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/extended-properties" Target="docProps/app.xml"/>
-</Relationships>` },
-    { name: "word/document.xml", data: document },
-    { name: "word/styles.xml", data: buildDocxStyles() },
-    { name: "word/header1.xml", data: buildDocxHeader(logo, p, ref, docLabel) },
-    { name: "word/footer1.xml", data: buildDocxFooter(ref, docLabel) },
-    { name: "word/_rels/document.xml.rels", data: `${xmlHeader()}
-<Relationships xmlns="${OOXML_XMLNS.rel}">
-  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/header" Target="header1.xml"/>
-  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/footer" Target="footer1.xml"/>
-  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/styles" Target="styles.xml"/>
-</Relationships>` },
-    { name: "word/_rels/header1.xml.rels", data: `${xmlHeader()}
-<Relationships xmlns="${OOXML_XMLNS.rel}">
-  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/image" Target="media/logo.png"/>
-</Relationships>` },
-    { name: "docProps/core.xml", data: officeCoreProps(docNo) },
-    { name: "docProps/app.xml", data: officeAppProps("Microsoft Office Word") }
-  ];
-  if (logo) parts.push({ name: "word/media/logo.png", data: logo.bytes });
-
-  return ooxmlZip(parts);
+  const rawPoints = (meta && meta.note && meta.note.trim())
+    ? meta.note.trim()
+    : (typeof buildDefaultMemoPoints === "function" ? buildDefaultMemoPoints(items) : "");
+  const points = rawPoints.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return buildMemoDocx(p, report, meta, items, points);
 }

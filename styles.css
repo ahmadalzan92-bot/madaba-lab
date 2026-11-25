@@ -1302,9 +1302,6 @@ body {
   .report-dashboard-actions { justify-content: flex-start; }
 }
 
-/* ===== مذكرة داخلية رسمية (مطابقة للنموذج المعتمد) ===== */
-.correspondence-modal-card { width: min(100%, 900px); }
-
 .correspondence-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1457,11 +1454,13 @@ body {
 
 .memo-cc-block {
   text-align: right;
-  font-size: 10.5pt;
-  font-weight: 700;
-  line-height: 1.9;
-  margin-top: 60px;
+  font-size: 11pt;
+  font-weight: 800;
+  line-height: 2;
+  margin: 55px 24px 12px;
 }
+
+.memo-spacer { height: 14px; }
 
 .correspondence-fields label,
 .correspondence-note-field {

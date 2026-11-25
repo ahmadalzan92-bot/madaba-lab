@@ -922,3 +922,70 @@ function buildCorrespondenceDocx(kind, p, report, items, meta) {
   const points = rawPoints.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   return buildMemoDocx(p, report, meta, items, points);
 }
+
+/* ==================== تصدير المذكرة المحرّرة (Word حي — altChunk) ==================== */
+function buildCorrespondenceDocxFromHtml(html, docNo, meta) {
+  const logo = getReportLogoImage();
+  const safeHtml = String(html || "")
+    .replace(/contenteditable="[^"]*"/g, "")
+    .replace(/spellcheck="[^"]*"/g, "");
+  const htmlPart = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${escXML(docNo || "مذكرة")}</title></head><body>${safeHtml}</body></html>`;
+  const emptyFooter = `${xmlHeader()}<w:ftr xmlns:w="${OOXML_XMLNS.word}"><w:p><w:pPr><w:pStyle w:val="RPFooter"/></w:pPr></w:p></w:ftr>`;
+  const document = `${xmlHeader()}
+<w:document xmlns:w="${OOXML_XMLNS.word}" xmlns:r="${OOXML_XMLNS.officeRel}" xmlns:wp="${OOXML_XMLNS.wp}" xmlns:a="${OOXML_XMLNS.drawing}" xmlns:pic="${OOXML_XMLNS.pic}">
+  <w:body>
+    <w:altChunk r:id="rIdAlt"/>
+    <w:sectPr>
+      <w:headerReference w:type="default" r:id="rId1"/>
+      <w:footerReference w:type="default" r:id="rId2"/>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="720" w:right="900" w:bottom="720" w:left="900" w:header="360" w:footer="360" w:gutter="0"/>
+      <w:bidi/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+  const parts = [
+    { name: "[Content_Types].xml", data: `${xmlHeader()}
+<Types xmlns="${OOXML_XMLNS.ct}">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Default Extension="html" ContentType="text/html"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
+  <Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
+  <Override PartName="/word/altChunk1.html" ContentType="text/html"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>` },
+    { name: "_rels/.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/officeDocument" Target="word/document.xml"/>
+  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/extended-properties" Target="docProps/app.xml"/>
+</Relationships>` },
+    { name: "word/document.xml", data: document },
+    { name: "word/styles.xml", data: buildDocxStyles() },
+    { name: "word/header1.xml", data: buildMemoDocxHeader(logo) },
+    { name: "word/footer1.xml", data: emptyFooter },
+    { name: "word/altChunk1.html", data: htmlPart },
+    { name: "word/_rels/document.xml.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/header" Target="header1.xml"/>
+  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/footer" Target="footer1.xml"/>
+  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/styles" Target="styles.xml"/>
+  <Relationship Id="rIdAlt" Type="${OOXML_XMLNS.officeRel}/afChunk" Target="altChunk1.html"/>
+</Relationships>` },
+    { name: "word/_rels/header1.xml.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/image" Target="media/logo.png"/>
+</Relationships>` },
+    { name: "docProps/core.xml", data: officeCoreProps(docNo) },
+    { name: "docProps/app.xml", data: officeAppProps("Microsoft Office Word") }
+  ];
+  if (logo) parts.push({ name: "word/media/logo.png", data: logo.bytes });
+
+  return ooxmlZip(parts);
+}

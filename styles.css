@@ -1472,6 +1472,31 @@ body {
   color: var(--slate-700, #334155);
 }
 
+.memo-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  padding: 4px 0 6px;
+  border-bottom: 1px dashed #cbd5e1;
+  margin-bottom: 6px;
+}
+
+.memo-toolbar .btn {
+  min-width: 26px;
+  padding: 2px 6px;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+#correspondencePreviewContent .report-paper {
+  outline: none;
+}
+
+#correspondencePreviewContent .report-paper:focus {
+  box-shadow: 0 0 0 2px rgba(67, 56, 202, 0.35);
+}
+
 .correspondence-intro {
   font-size: 0.8rem;
   line-height: 1.7;

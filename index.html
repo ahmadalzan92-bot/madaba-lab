@@ -2423,6 +2423,31 @@ body {
   color: var(--slate-700, #334155);
 }
 
+.memo-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  padding: 4px 0 6px;
+  border-bottom: 1px dashed #cbd5e1;
+  margin-bottom: 6px;
+}
+
+.memo-toolbar .btn {
+  min-width: 26px;
+  padding: 2px 6px;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+#correspondencePreviewContent .report-paper {
+  outline: none;
+}
+
+#correspondencePreviewContent .report-paper:focus {
+  box-shadow: 0 0 0 2px rgba(67, 56, 202, 0.35);
+}
+
 .correspondence-intro {
   font-size: 0.8rem;
   line-height: 1.7;
@@ -5248,6 +5273,23 @@ input[inputmode="decimal"] {
   <div id="correspondencePreviewModal" class="report-modal hidden no-print">
     <div class="report-modal-toolbar no-print">
       <div><strong id="correspondencePreviewTitle">معاينة المراسلة</strong></div>
+      <div class="memo-toolbar no-print">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('bold')" title="عريض"><b>B</b></button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('italic')" title="مائل"><i>I</i></button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('underline')" title="تسطير"><u>U</u></button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('strikeThrough')" title="خط في المنتصف"><s>S</s></button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('justifyRight')" title="محاذاة يمين">➡</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('justifyCenter')" title="توسيط">↔</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('justifyLeft')" title="محاذاة يسار">⬅</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('justifyFull')" title="ضبط">⇔</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('insertUnorderedList')" title="قائمة نقطية">•</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('insertOrderedList')" title="قائمة مرقمة">1.</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('indent')" title="زيادة الإزاحة">→</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('outdent')" title="تقليل الإزاحة">←</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('undo')" title="تراجع">↶</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('redo')" title="إعادة">↷</button>
+        <button type="button" class="btn btn-outline-dark btn-sm" onclick="memoResetToAuto()" title="إعادة توليد المذكرة من البيانات">↺ إعادة توليد</button>
+      </div>
       <div class="report-modal-buttons">
         <button type="button" class="btn btn-print btn-sm" onclick="printCorrespondencePreview()">🖨️ طباعة</button>
         <button type="button" class="btn btn-word btn-sm" onclick="exportCorrespondenceWord()">📘 Word</button>
@@ -8098,6 +8140,73 @@ function buildCorrespondenceDocx(kind, p, report, items, meta) {
   return buildMemoDocx(p, report, meta, items, points);
 }
 
+/* ==================== تصدير المذكرة المحرّرة (Word حي — altChunk) ==================== */
+function buildCorrespondenceDocxFromHtml(html, docNo, meta) {
+  const logo = getReportLogoImage();
+  const safeHtml = String(html || "")
+    .replace(/contenteditable="[^"]*"/g, "")
+    .replace(/spellcheck="[^"]*"/g, "");
+  const htmlPart = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${escXML(docNo || "مذكرة")}</title></head><body>${safeHtml}</body></html>`;
+  const emptyFooter = `${xmlHeader()}<w:ftr xmlns:w="${OOXML_XMLNS.word}"><w:p><w:pPr><w:pStyle w:val="RPFooter"/></w:pPr></w:p></w:ftr>`;
+  const document = `${xmlHeader()}
+<w:document xmlns:w="${OOXML_XMLNS.word}" xmlns:r="${OOXML_XMLNS.officeRel}" xmlns:wp="${OOXML_XMLNS.wp}" xmlns:a="${OOXML_XMLNS.drawing}" xmlns:pic="${OOXML_XMLNS.pic}">
+  <w:body>
+    <w:altChunk r:id="rIdAlt"/>
+    <w:sectPr>
+      <w:headerReference w:type="default" r:id="rId1"/>
+      <w:footerReference w:type="default" r:id="rId2"/>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="720" w:right="900" w:bottom="720" w:left="900" w:header="360" w:footer="360" w:gutter="0"/>
+      <w:bidi/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+  const parts = [
+    { name: "[Content_Types].xml", data: `${xmlHeader()}
+<Types xmlns="${OOXML_XMLNS.ct}">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Default Extension="html" ContentType="text/html"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
+  <Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
+  <Override PartName="/word/altChunk1.html" ContentType="text/html"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>` },
+    { name: "_rels/.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/officeDocument" Target="word/document.xml"/>
+  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/extended-properties" Target="docProps/app.xml"/>
+</Relationships>` },
+    { name: "word/document.xml", data: document },
+    { name: "word/styles.xml", data: buildDocxStyles() },
+    { name: "word/header1.xml", data: buildMemoDocxHeader(logo) },
+    { name: "word/footer1.xml", data: emptyFooter },
+    { name: "word/altChunk1.html", data: htmlPart },
+    { name: "word/_rels/document.xml.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/header" Target="header1.xml"/>
+  <Relationship Id="rId2" Type="${OOXML_XMLNS.officeRel}/footer" Target="footer1.xml"/>
+  <Relationship Id="rId3" Type="${OOXML_XMLNS.officeRel}/styles" Target="styles.xml"/>
+  <Relationship Id="rIdAlt" Type="${OOXML_XMLNS.officeRel}/afChunk" Target="altChunk1.html"/>
+</Relationships>` },
+    { name: "word/_rels/header1.xml.rels", data: `${xmlHeader()}
+<Relationships xmlns="${OOXML_XMLNS.rel}">
+  <Relationship Id="rId1" Type="${OOXML_XMLNS.officeRel}/image" Target="media/logo.png"/>
+</Relationships>` },
+    { name: "docProps/core.xml", data: officeCoreProps(docNo) },
+    { name: "docProps/app.xml", data: officeAppProps("Microsoft Office Word") }
+  ];
+  if (logo) parts.push({ name: "word/media/logo.png", data: logo.bytes });
+
+  return ooxmlZip(parts);
+}
+
 
 // المحرك الهندسي لحساب الحسميات والشذوذات المخبرية لمشاريع الطرق (إصدار 2023)
 // وزارة الأشغال العامة والإسكان - مديرية أشغال محافظة مأدبا - المملكة الأردنية الهاشمية
@@ -10333,9 +10442,18 @@ function previewCorrespondence() {
   const ctx = collectCorrespondenceContext();
   if (!ctx) return;
   correspondenceState.html = buildCorrespondenceHTML(ctx.project, ctx.report, ctx.state);
+  correspondenceState.editedHTML = null;
   document.getElementById("correspondencePreviewTitle").textContent =
     `${CORRESPONDENCE_DEFS.memo.label} — ${ctx.state.docNo}`;
   document.getElementById("correspondencePreviewContent").innerHTML = correspondenceState.html;
+  const paper = document.querySelector("#correspondencePreviewContent .report-paper");
+  if (paper) {
+    paper.setAttribute("contenteditable", "true");
+    paper.setAttribute("spellcheck", "false");
+    paper.addEventListener("input", () => {
+      if (correspondenceState) correspondenceState.editedHTML = paper.outerHTML;
+    });
+  }
   closeCorrespondenceModal();
   document.getElementById("correspondencePreviewModal").classList.remove("hidden");
 }
@@ -10349,13 +10467,24 @@ function updateCorrespondencePreviewDate(input) {
   const date = validEditedDate(input, st.date);
   if (!date) return;
   st.date = date;
+  st.editedHTML = null;
   st.html = buildCorrespondenceHTML(p, r, st);
   document.getElementById("correspondencePreviewContent").innerHTML = st.html;
+  const paper = document.querySelector("#correspondencePreviewContent .report-paper");
+  if (paper) {
+    paper.setAttribute("contenteditable", "true");
+    paper.setAttribute("spellcheck", "false");
+    paper.addEventListener("input", () => {
+      if (correspondenceState) correspondenceState.editedHTML = paper.outerHTML;
+    });
+  }
 }
 
 function printCorrespondencePreview() {
-  if (!correspondenceState || !correspondenceState.html) return;
-  document.getElementById("printReportContainer").innerHTML = correspondenceState.html;
+  if (!correspondenceState) return;
+  const html = correspondenceState.editedHTML || correspondenceState.html;
+  if (!html) return;
+  document.getElementById("printReportContainer").innerHTML = html;
   prepareReportPrint();
   window.print();
 }
@@ -10363,10 +10492,36 @@ function printCorrespondencePreview() {
 function exportCorrespondenceWord() {
   const ctx = collectCorrespondenceContext();
   if (!ctx) return;
-  downloadBlobFile(
-    buildCorrespondenceDocx(ctx.state.kind, ctx.project, ctx.report, ctx.state.selectedItems, ctx.state),
-    safeFileName(ctx.state.docNo) + ".docx"
-  );
+  const editedHTML = correspondenceState && correspondenceState.editedHTML;
+  const blob = editedHTML
+    ? buildCorrespondenceDocxFromHtml(editedHTML, ctx.state.docNo, ctx.state)
+    : buildCorrespondenceDocx(ctx.state.kind, ctx.project, ctx.report, ctx.state.selectedItems, ctx.state);
+  downloadBlobFile(blob, safeFileName(ctx.state.docNo) + ".docx");
+}
+
+function memoCmd(command) {
+  try { document.execCommand(command, false, null); } catch (e) { /* تجاهل */ }
+  const paper = document.querySelector("#correspondencePreviewContent .report-paper");
+  if (paper && correspondenceState) correspondenceState.editedHTML = paper.outerHTML;
+}
+
+function memoResetToAuto() {
+  const st = correspondenceState;
+  if (!st) return;
+  const p = getProjectById(st.projectId);
+  const r = p ? p.reports.find((x) => x.id === st.reportId) : null;
+  if (!p || !r) return;
+  st.editedHTML = null;
+  st.html = buildCorrespondenceHTML(p, r, st);
+  document.getElementById("correspondencePreviewContent").innerHTML = st.html;
+  const paper = document.querySelector("#correspondencePreviewContent .report-paper");
+  if (paper) {
+    paper.setAttribute("contenteditable", "true");
+    paper.setAttribute("spellcheck", "false");
+    paper.addEventListener("input", () => {
+      if (correspondenceState) correspondenceState.editedHTML = paper.outerHTML;
+    });
+  }
 }
 
 function renderProjectReports(p) {

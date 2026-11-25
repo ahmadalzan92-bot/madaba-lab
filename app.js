@@ -2232,9 +2232,18 @@ function previewCorrespondence() {
   const ctx = collectCorrespondenceContext();
   if (!ctx) return;
   correspondenceState.html = buildCorrespondenceHTML(ctx.project, ctx.report, ctx.state);
+  correspondenceState.editedHTML = null;
   document.getElementById("correspondencePreviewTitle").textContent =
     `${CORRESPONDENCE_DEFS.memo.label} — ${ctx.state.docNo}`;
   document.getElementById("correspondencePreviewContent").innerHTML = correspondenceState.html;
+  const paper = document.querySelector("#correspondencePreviewContent .report-paper");
+  if (paper) {
+    paper.setAttribute("contenteditable", "true");
+    paper.setAttribute("spellcheck", "false");
+    paper.addEventListener("input", () => {
+      if (correspondenceState) correspondenceState.editedHTML = paper.outerHTML;
+    });
+  }
   closeCorrespondenceModal();
   document.getElementById("correspondencePreviewModal").classList.remove("hidden");
 }
@@ -2248,13 +2257,24 @@ function updateCorrespondencePreviewDate(input) {
   const date = validEditedDate(input, st.date);
   if (!date) return;
   st.date = date;
+  st.editedHTML = null;
   st.html = buildCorrespondenceHTML(p, r, st);
   document.getElementById("correspondencePreviewContent").innerHTML = st.html;
+  const paper = document.querySelector("#correspondencePreviewContent .report-paper");
+  if (paper) {
+    paper.setAttribute("contenteditable", "true");
+    paper.setAttribute("spellcheck", "false");
+    paper.addEventListener("input", () => {
+      if (correspondenceState) correspondenceState.editedHTML = paper.outerHTML;
+    });
+  }
 }
 
 function printCorrespondencePreview() {
-  if (!correspondenceState || !correspondenceState.html) return;
-  document.getElementById("printReportContainer").innerHTML = correspondenceState.html;
+  if (!correspondenceState) return;
+  const html = correspondenceState.editedHTML || correspondenceState.html;
+  if (!html) return;
+  document.getElementById("printReportContainer").innerHTML = html;
   prepareReportPrint();
   window.print();
 }
@@ -2262,10 +2282,36 @@ function printCorrespondencePreview() {
 function exportCorrespondenceWord() {
   const ctx = collectCorrespondenceContext();
   if (!ctx) return;
-  downloadBlobFile(
-    buildCorrespondenceDocx(ctx.state.kind, ctx.project, ctx.report, ctx.state.selectedItems, ctx.state),
-    safeFileName(ctx.state.docNo) + ".docx"
-  );
+  const editedHTML = correspondenceState && correspondenceState.editedHTML;
+  const blob = editedHTML
+    ? buildCorrespondenceDocxFromHtml(editedHTML, ctx.state.docNo, ctx.state)
+    : buildCorrespondenceDocx(ctx.state.kind, ctx.project, ctx.report, ctx.state.selectedItems, ctx.state);
+  downloadBlobFile(blob, safeFileName(ctx.state.docNo) + ".docx");
+}
+
+function memoCmd(command) {
+  try { document.execCommand(command, false, null); } catch (e) { /* تجاهل */ }
+  const paper = document.querySelector("#correspondencePreviewContent .report-paper");
+  if (paper && correspondenceState) correspondenceState.editedHTML = paper.outerHTML;
+}
+
+function memoResetToAuto() {
+  const st = correspondenceState;
+  if (!st) return;
+  const p = getProjectById(st.projectId);
+  const r = p ? p.reports.find((x) => x.id === st.reportId) : null;
+  if (!p || !r) return;
+  st.editedHTML = null;
+  st.html = buildCorrespondenceHTML(p, r, st);
+  document.getElementById("correspondencePreviewContent").innerHTML = st.html;
+  const paper = document.querySelector("#correspondencePreviewContent .report-paper");
+  if (paper) {
+    paper.setAttribute("contenteditable", "true");
+    paper.setAttribute("spellcheck", "false");
+    paper.addEventListener("input", () => {
+      if (correspondenceState) correspondenceState.editedHTML = paper.outerHTML;
+    });
+  }
 }
 
 function renderProjectReports(p) {

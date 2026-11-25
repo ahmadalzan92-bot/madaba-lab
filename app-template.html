@@ -3599,6 +3599,23 @@ input[inputmode="decimal"] {
   <div id="correspondencePreviewModal" class="report-modal hidden no-print">
     <div class="report-modal-toolbar no-print">
       <div><strong id="correspondencePreviewTitle">معاينة المراسلة</strong></div>
+      <div class="memo-toolbar no-print">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('bold')" title="عريض"><b>B</b></button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('italic')" title="مائل"><i>I</i></button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('underline')" title="تسطير"><u>U</u></button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('strikeThrough')" title="خط في المنتصف"><s>S</s></button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('justifyRight')" title="محاذاة يمين">➡</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('justifyCenter')" title="توسيط">↔</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('justifyLeft')" title="محاذاة يسار">⬅</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('justifyFull')" title="ضبط">⇔</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('insertUnorderedList')" title="قائمة نقطية">•</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('insertOrderedList')" title="قائمة مرقمة">1.</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('indent')" title="زيادة الإزاحة">→</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('outdent')" title="تقليل الإزاحة">←</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('undo')" title="تراجع">↶</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="memoCmd('redo')" title="إعادة">↷</button>
+        <button type="button" class="btn btn-outline-dark btn-sm" onclick="memoResetToAuto()" title="إعادة توليد المذكرة من البيانات">↺ إعادة توليد</button>
+      </div>
       <div class="report-modal-buttons">
         <button type="button" class="btn btn-print btn-sm" onclick="printCorrespondencePreview()">🖨️ طباعة</button>
         <button type="button" class="btn btn-word btn-sm" onclick="exportCorrespondenceWord()">📘 Word</button>
